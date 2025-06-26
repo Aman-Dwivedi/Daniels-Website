@@ -23,8 +23,8 @@ export function ClientsSection() {
     { name: "Peabody Energy", logo: "/images/logos/peabody-energy.png" },
   ]
 
-  // Create enough copies for seamless infinite scroll
-  const infiniteClients = [...clients, ...clients, ...clients, ...clients]
+  // Create exactly 2 copies for seamless infinite scroll
+  const infiniteClients = [...clients, ...clients]
 
   const officeLocations = [
     { name: "Charleston, WV", country: "United States", x: "24%", y: "35%", label: "USA HQ" },
@@ -37,9 +37,9 @@ export function ClientsSection() {
 
   return (
     <section className="pt-20 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Trusted by Industry Leaders - Now with Gray Background */}
-        <div className="bg-gray-50 rounded-2xl p-8 md:p-12 mb-16">
+      {/* Trusted by Industry Leaders - Full width gray background */}
+      <div className="bg-gray-50 py-8 md:py-12 mb-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Trusted by Industry Leaders</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -127,8 +127,10 @@ export function ClientsSection() {
             <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-gray-50 via-gray-50 to-transparent pointer-events-none z-10"></div>
           </div>
         </div>
+      </div>
 
-        {/* Global Presence Section - Now with White Background */}
+      {/* Global Presence Section - Now with White Background */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-16">
           <div className="text-center mb-12">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Global Presence</h3>
