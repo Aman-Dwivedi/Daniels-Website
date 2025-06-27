@@ -27,12 +27,13 @@ export function ClientsSection() {
   const infiniteClients = [...clients, ...clients]
 
   const officeLocations = [
-    { name: "Charleston, WV", country: "United States", x: "24%", y: "35%", label: "USA HQ" },
-    { name: "Sydney", country: "Australia", x: "85%", y: "75%", label: "Australia" },
-    { name: "Mumbai", country: "India", x: "68%", y: "45%", label: "India" },
-    { name: "Johannesburg", country: "South Africa", x: "54%", y: "70%", label: "South Africa" },
-    { name: "London", country: "United Kingdom", x: "48%", y: "28%", label: "UK" },
-    { name: "Jakarta", country: "Indonesia", x: "78%", y: "58%", label: "Indonesia" },
+    { name: "Bluefield, WV", country: "United States", x: "22%", y: "32%", label: "Bluefield, USA", labelDirection: "left", labelOffset: "120px", labelX: "10%", labelY: "32%" },
+    { name: "Beijing", country: "China", x: "77%", y: "30%", label: "Beijing, China", labelDirection: "right", labelOffset: "100px", labelX: "85%", labelY: "30%" },
+    { name: "New Delhi", country: "India", x: "67%", y: "38%", label: "New Delhi, India", labelDirection: "right", labelOffset: "110px", labelX: "80%", labelY: "38%" },
+    { name: "Ankara", country: "Turkey", x: "54%", y: "29%", label: "Ankara, Turkey", labelDirection: "left", labelOffset: "100px", labelX: "40%", labelY: "35%" },
+    { name: "Bogota", country: "Colombia", x: "23%", y: "55%", label: "Bogota, Colombia", labelDirection: "left", labelOffset: "120px", labelX: "8%", labelY: "55%" },
+    { name: "Almaty", country: "Kazakhstan", x: "65%", y: "26%", label: "Almaty, Kazakhstan", labelDirection: "left", labelOffset: "130px", labelX: "45%", labelY: "20%" },
+    { name: "Ulaanbaatar", country: "Mongolia", x: "72.5%", y: "23.5%", label: "Ulaanbaatar, Mongolia", labelDirection: "right", labelOffset: "140px", labelX: "85%", labelY: "15%" },
   ]
 
   return (
@@ -164,24 +165,57 @@ export function ClientsSection() {
 
               {/* Office Location Markers */}
               {officeLocations.map((location, index) => (
-                <div
-                  key={index}
-                  className="absolute transform -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: location.x, top: location.y }}
-                >
+                <div key={index} className="absolute inset-0">
                   {/* Location Dot */}
-                  <div className="relative">
-                    <div className="w-4 h-4 bg-orange-500 rounded-full border-2 border-white shadow-lg"></div>
-                    <div className="absolute top-0 left-0 w-4 h-4 bg-orange-500 rounded-full animate-ping opacity-75"></div>
+                  <div
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: location.x, top: location.y }}
+                  >
+                    <div className="relative">
+                      <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-lg"></div>
+                      <div className="absolute top-0 left-0 w-4 h-4 bg-orange-500 rounded-full animate-ping opacity-75"></div>
+                    </div>
                   </div>
 
-                  {/* Location Label */}
-                  <div className="absolute top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                    <div className="bg-white px-3 py-1 rounded-md shadow-md border border-gray-200">
+                  {/* L-shaped connecting lines (horizontal then vertical) */}
+                  {/* Horizontal line from dot */}
+                  <div
+                    className="absolute border-t-2 border-black"
+                    style={{
+                      left: location.x,
+                      top: location.y,
+                      width: parseFloat(location.labelY.replace('%', '')) === parseFloat(location.y.replace('%', ''))
+                        ? `calc(${Math.abs(parseFloat(location.labelX.replace('%', '')) - parseFloat(location.x.replace('%', '')))}% - 50px)`
+                        : `${Math.abs(parseFloat(location.labelX.replace('%', '')) - parseFloat(location.x.replace('%', '')))}%`,
+                      transform: parseFloat(location.labelX.replace('%', '')) < parseFloat(location.x.replace('%', '')) ? 'translateX(-100%)' : 'none'
+                    }}
+                  ></div>
+                  
+                  {/* Vertical line to label edge */}
+                  {parseFloat(location.labelY.replace('%', '')) !== parseFloat(location.y.replace('%', '')) && (
+                    <div
+                      className="absolute border-l-2 border-black"
+                      style={{
+                        left: location.labelX,
+                        top: parseFloat(location.labelY.replace('%', '')) < parseFloat(location.y.replace('%', '')) 
+                          ? `calc(${location.labelY} + 16px)` 
+                          : location.y,
+                        height: `calc(${Math.abs(parseFloat(location.labelY.replace('%', '')) - parseFloat(location.y.replace('%', '')))}% - 16px)`
+                      }}
+                    ></div>
+                  )}
+
+                  {/* Location Label positioned separately - rendered last to appear on top */}
+                  <div
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                    style={{ 
+                      left: location.labelX,
+                      top: location.labelY 
+                    }}
+                  >
+                    <div className="bg-white px-3 py-1 rounded-md shadow-md border border-gray-200 whitespace-nowrap">
                       <span className="text-xs font-semibold text-gray-700">{location.label}</span>
                     </div>
-                    {/* Arrow pointing to dot */}
-                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-l border-t border-gray-200 rotate-45"></div>
                   </div>
                 </div>
               ))}
@@ -189,7 +223,7 @@ export function ClientsSection() {
 
             <div className="text-center mt-8">
               <p className="text-sm text-gray-600">
-                Our offices span across 6 continents, ensuring local expertise and global reach for all your coal
+                Our offices span across 3 continents, ensuring local expertise and global reach for all your coal
                 processing needs
               </p>
             </div>
