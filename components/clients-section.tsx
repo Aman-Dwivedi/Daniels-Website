@@ -174,7 +174,7 @@ export function ClientsSection() {
                   >
                     <div className="relative">
                       <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-lg"></div>
-                      <div className="absolute top-0 left-0 w-4 h-4 bg-orange-500 rounded-full animate-ping opacity-75"></div>
+                      {/* <div className="absolute top-0 left-0 w-4 h-4 bg-orange-500 rounded-full animate-ping opacity-75"></div> */}
                     </div>
                   </div>
 
