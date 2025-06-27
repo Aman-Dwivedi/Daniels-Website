@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Facebook, Twitter, Linkedin, Mail, Phone, MapPin } from "lucide-react"
+import { Facebook, Twitter, Linkedin, Mail, Phone, MapPin, Instagram } from "lucide-react"
 
 export function Footer() {
   return (
@@ -17,17 +17,14 @@ export function Footer() {
               className="h-8 w-auto mb-4 brightness-0 invert"
             />
             <p className="text-gray-300 mb-6 max-w-md">
-              Leading coal processing solutions with over 35 years of experience. We deliver innovative, efficient, and
+              Leading coal processing solutions with over 70 years of experience. We deliver innovative, efficient, and
               sustainable processing technologies for the global energy industry.
             </p>
             <div className="flex space-x-4">
-              <Link href="#" className="text-gray-400 hover:text-orange-500 transition-colors">
-                <Facebook className="h-6 w-6" />
+              <Link href="https://www.instagram.com/tdcdaniels/" className="text-gray-400 hover:text-orange-500 transition-colors">
+                <Instagram className="h-6 w-6" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-orange-500 transition-colors">
-                <Twitter className="h-6 w-6" />
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-orange-500 transition-colors">
+              <Link href="https://www.linkedin.com/company/the-daniels-co" className="text-gray-400 hover:text-orange-500 transition-colors">
                 <Linkedin className="h-6 w-6" />
               </Link>
             </div>
@@ -38,27 +35,27 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#about" className="text-gray-300 hover:text-orange-500 transition-colors">
-                  About Us
+                <Link href="/about" className="text-gray-300 hover:text-orange-500 transition-colors">
+                  About
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="text-gray-300 hover:text-orange-500 transition-colors">
+                <Link href="/services" className="text-gray-300 hover:text-orange-500 transition-colors">
                   Services
                 </Link>
               </li>
               <li>
-                <Link href="#news" className="text-gray-300 hover:text-orange-500 transition-colors">
-                  News & Updates
+                <Link href="/equipments" className="text-gray-300 hover:text-orange-500 transition-colors">
+                  Equipments
                 </Link>
               </li>
               <li>
-                <Link href="#careers" className="text-gray-300 hover:text-orange-500 transition-colors">
-                  Careers
+                <Link href="/sample-projects" className="text-gray-300 hover:text-orange-500 transition-colors">
+                  Sample Projects
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="text-gray-300 hover:text-orange-500 transition-colors">
+                <Link href="/contact" className="text-gray-300 hover:text-orange-500 transition-colors">
                   Contact
                 </Link>
               </li>
@@ -72,18 +69,18 @@ export function Footer() {
               <div className="flex items-center">
                 <MapPin className="h-5 w-5 text-orange-500 mr-3 flex-shrink-0" />
                 <span className="text-gray-300">
-                  1234 Industrial Blvd
+                  238 Markell Drive
                   <br />
-                  Coal Valley, WV 25301
+                  Bluefield, WV 24701
                 </span>
               </div>
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-orange-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-300">+1 (555) 123-4567</span>
+                <span className="text-gray-300">+1 (304) 327-8161</span>
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-orange-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-300">info@danielscompany.com</span>
+                <span className="text-gray-300">info@daniels-wv.com</span>
               </div>
             </div>
           </div>
@@ -91,17 +88,9 @@ export function Footer() {
 
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">© 2024 The Daniels Company. All rights reserved.</p>
+            <p className="text-gray-400 text-sm">© 2025 The Daniels Company. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="#" className="text-gray-400 hover:text-orange-500 text-sm transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-orange-500 text-sm transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-orange-500 text-sm transition-colors">
-                Cookie Policy
-              </Link>
+              Made by Aman
             </div>
           </div>
         </div>
