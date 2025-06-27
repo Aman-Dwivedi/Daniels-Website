@@ -14,23 +14,28 @@ export default function AboutPage() {
   const features = [
     {
       icon: Factory,
-      title: "Advanced Processing",
-      description: "State-of-the-art coal processing facilities with cutting-edge technology",
-    },
-    {
-      icon: Zap,
-      title: "Efficient Operations",
-      description: "Optimized processes that maximize yield and minimize environmental impact",
-    },
-    {
-      icon: Shield,
-      title: "Safety First",
-      description: "Comprehensive safety protocols ensuring the highest industry standards",
+      title: "Excellent Equipment Offering & Supplier Network",
+      description: "GT series processing equipment and dependable supplier network.",
     },
     {
       icon: Users,
-      title: "Expert Team",
-      description: "Experienced professionals dedicated to delivering exceptional results",
+      title: "Experienced & Talented Team",
+      description: "All principal engineers average 20+ years of experience. Team members cover the entire spectrum of coal prep engineering.",
+    },
+    {
+      icon: Shield,
+      title: "Core Design Philosophy",
+      description: "Say no to \"cookie cutter designs\". Optimized and customized solutions for maximum performance.",
+    },
+    {
+      icon: Zap,
+      title: "Advanced Technologies",
+      description: "Proprietary technologies for guaranteed plant performance with competitive operating cost (media, water, electricity).",
+    },
+    {
+      icon: Globe,
+      title: "Rich International Experiences",
+      description: "Project experiences in Australia, Canada, China, Colombia, India, Indonesia, Kazakhstan, Mexico, Mongolia, Mozambique, Turkey, etc.",
     },
   ]
 
@@ -97,32 +102,27 @@ export default function AboutPage() {
       </section>
 
       {/* Company Story */}
-      <section className="py-20 bg-white">
+      <section className="pt-20 pb-10 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
               <p className="text-gray-600 mb-4">
-                Founded in 1985, The Daniels Company began as a small family-owned operation with a vision to
-                revolutionize coal processing through innovative technology and unwavering commitment to quality.
+              Founded by Herman J. Daniels and incorporated in Hazelton, Pennsylvania in 1953, The Daniels Company stands as one of the most experienced companies in the global coal preparation engineering industry. From our earliest days, we established ourselves as innovators, creating the original Daniels heavy media vessel that would become famous throughout the industry.
               </p>
               <p className="text-gray-600 mb-4">
-                Over the decades, we have grown from a local service provider to a globally recognized leader in coal
-                processing solutions. Our journey has been marked by continuous innovation, strategic partnerships, and
-                an unwavering dedication to our clients' success.
+              Our expertise has grown through decades of hands-on experience, having engineered and built coal handling and preparation plant projects across the United States. Beyond our domestic success, we have developed extensive international project experience, delivering solutions in Canada, Colombia, India, Indonesia, Kazakhstan, Turkey, Mongolia, and many other nations around the world.
               </p>
               <p className="text-gray-600 mb-6">
-                Today, we operate state-of-the-art facilities across multiple continents, serving some of the world's
-                largest energy companies while maintaining the personal touch and attention to detail that built our
-                reputation.
+              From inventing the world's first Daniels heavy medium vessel to engineering coal preparation plants across the globe, our seven-decade legacy of excellence drives our unwavering commitment to serving the coal preparation industry. At The Daniels Company, we deliver Unmatched Process Solutions, one project at a time.
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <div className="text-3xl font-bold text-orange-500">35+</div>
+                  <div className="text-3xl font-bold text-orange-500">70+</div>
                   <div className="text-sm text-gray-600">Years Experience</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-orange-500">500+</div>
+                  <div className="text-3xl font-bold text-orange-500">180+</div>
                   <div className="text-sm text-gray-600">Projects Completed</div>
                 </div>
                 <div>
@@ -142,6 +142,166 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Timeline Section */}
+      <section className="pt-10 pb-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Journey Through Time</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Seven decades of innovation, growth, and excellence in coal preparation engineering
+            </p>
+          </div>
+
+          <div className="relative h-40">
+            {/* Timeline Line */}
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-400 transform -translate-y-1/2" style={{zIndex: 1}}></div>
+            
+            {/* Timeline Items */}
+            <div className="flex justify-between h-full px-4">
+              {/* 1953 - Below */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+                <div className="text-center mt-16">
+                  <div className="text-sm font-bold text-gray-900">1953</div>
+                  <div className="text-xs text-gray-600">Incorporated</div>
+                  <div className="text-xs text-gray-500">Hazelton, PA</div>
+                </div>
+              </div>
+
+              {/* 1954 - Above */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="text-center mb-16">
+                  <div className="text-sm font-bold text-gray-900">1954</div>
+                  <div className="text-xs text-gray-600">First vessel shipped</div>
+                  <div className="text-xs text-gray-500">to customer</div>
+                </div>
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+              </div>
+
+              {/* 1956 - Below */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+                <div className="text-center mt-16">
+                  <div className="text-sm font-bold text-gray-900">1956</div>
+                  <div className="text-xs text-gray-600">Relocated to</div>
+                  <div className="text-xs text-gray-500">Bluefield, WV</div>
+                </div>
+              </div>
+
+              {/* 1984 - Above */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="text-center mb-16">
+                  <div className="text-sm font-bold text-gray-900">1984</div>
+                  <div className="text-xs text-gray-600">Acquired Envirotech</div>
+                  <div className="text-xs text-gray-500">Coal Services</div>
+                </div>
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+              </div>
+
+              {/* 1987 - Below */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+                <div className="text-center mt-16">
+                  <div className="text-sm font-bold text-gray-900">1987</div>
+                  <div className="text-xs text-gray-600">4 vessels to</div>
+                  <div className="text-xs text-gray-500">An Tai Bao, China</div>
+                </div>
+              </div>
+
+              {/* 2004 - Above */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="text-center mb-16">
+                  <div className="text-sm font-bold text-gray-900">2004</div>
+                  <div className="text-xs text-gray-600">1,200 TPH plant</div>
+                  <div className="text-xs text-gray-500">Edison, Canada</div>
+                </div>
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+              </div>
+
+              {/* 2009 - Below */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+                <div className="text-center mt-16">
+                  <div className="text-sm font-bold text-gray-900">2009</div>
+                  <div className="text-xs text-gray-600">Best Design</div>
+                  <div className="text-xs text-gray-500">Award by CPSA</div>
+                </div>
+              </div>
+
+              {/* 2010 - Above */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="text-center mb-16">
+                  <div className="text-sm font-bold text-gray-900">2010</div>
+                  <div className="text-xs text-gray-600">First project</div>
+                  <div className="text-xs text-gray-500">South America</div>
+                </div>
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+              </div>
+
+              {/* 2012 - Below */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+                <div className="text-center mt-16">
+                  <div className="text-sm font-bold text-gray-900">2012</div>
+                  <div className="text-xs text-gray-600">Member of</div>
+                  <div className="text-xs text-gray-500">GT Global</div>
+                </div>
+              </div>
+
+              {/* 2017 - Above */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="text-center mb-16">
+                  <div className="text-sm font-bold text-gray-900">2017</div>
+                  <div className="text-xs text-gray-600">Indian office</div>
+                  <div className="text-xs text-gray-500">Gurgaon, India</div>
+                </div>
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+              </div>
+
+              {/* 2020 - Below */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+                <div className="text-center mt-16">
+                  <div className="text-sm font-bold text-gray-900">2020</div>
+                  <div className="text-xs text-gray-600">First project</div>
+                  <div className="text-xs text-gray-500">Turkey</div>
+                </div>
+              </div>
+
+              {/* 2021 - Above */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="text-center mb-16">
+                  <div className="text-sm font-bold text-gray-900">2021</div>
+                  <div className="text-xs text-gray-600">2 projects</div>
+                  <div className="text-xs text-gray-500">Turkey</div>
+                </div>
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+              </div>
+
+              {/* 2022 - Below */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+                <div className="text-center mt-16">
+                  <div className="text-sm font-bold text-gray-900">2022</div>
+                  <div className="text-xs text-gray-600">First project</div>
+                  <div className="text-xs text-gray-500">Indonesia</div>
+                </div>
+              </div>
+
+              {/* 2024 - Above */}
+              <div className="relative flex flex-col items-center justify-center h-full">
+                <div className="text-center mb-16">
+                  <div className="text-sm font-bold text-gray-900">2024</div>
+                  <div className="text-xs text-gray-600">Largest automated</div>
+                  <div className="text-xs text-gray-500">plant in Africa</div>
+                </div>
+                <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-md absolute" style={{zIndex: 2, top: '50%', transform: 'translateY(-50%)'}}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Core Features */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -153,54 +313,42 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="h-8 w-8 text-orange-500" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Company Values */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Values</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              These core values guide every decision we make and every relationship we build.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {values.map((value, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-8">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <value.icon className="h-6 w-6 text-orange-500" />
+          <div className="max-w-6xl mx-auto">
+            {/* First row - 3 items */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              {features.slice(0, 3).map((feature, index) => (
+                <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <feature.icon className="h-8 w-8 text-orange-500" />
                     </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{value.title}</h3>
-                      <p className="text-gray-600">{value.description}</p>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                    <p className="text-gray-600">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* Second row - 2 items centered */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+              {features.slice(3, 5).map((feature, index) => (
+                <Card key={index + 3} className="text-center hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <feature.icon className="h-8 w-8 text-orange-500" />
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                    <p className="text-gray-600">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Leadership Team */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Leadership Team</h2>
@@ -211,13 +359,13 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { name: "John Daniels", role: "Chief Executive Officer", experience: "25+ years in coal processing" },
+              { name: "John R. Cassey II", role: "President", experience: "25+ years in coal processing" },
               {
-                name: "Sarah Mitchell",
-                role: "Chief Operations Officer",
+                name: "Zhigang Wang, P.E.",
+                role: "Vice President",
                 experience: "20+ years in industrial operations",
               },
-              { name: "Michael Chen", role: "Chief Technology Officer", experience: "15+ years in mining technology" },
+              { name: "Dona Casey", role: "Vesel Parts Sales", experience: "15+ years in mining technology" },
             ].map((leader, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
