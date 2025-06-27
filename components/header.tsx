@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button"
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,9 +44,25 @@ export function Header() {
 
           <nav className="hidden md:flex space-x-8">
             <Link
+              href="/"
+              className={`transition-colors duration-300 ${
+                pathname === "/" 
+                  ? "text-orange-500" 
+                  : scrolled 
+                    ? "text-gray-700 hover:text-orange-500" 
+                    : "text-white hover:text-orange-300"
+              }`}
+            >
+              Home
+            </Link>
+            <Link
               href="/about"
               className={`transition-colors duration-300 ${
-                scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                pathname === "/about" 
+                  ? "text-orange-500" 
+                  : scrolled 
+                    ? "text-gray-700 hover:text-orange-500" 
+                    : "text-white hover:text-orange-300"
               }`}
             >
               About
@@ -52,7 +70,11 @@ export function Header() {
             <Link
               href="/services"
               className={`transition-colors duration-300 ${
-                scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                pathname === "/services" 
+                  ? "text-orange-500" 
+                  : scrolled 
+                    ? "text-gray-700 hover:text-orange-500" 
+                    : "text-white hover:text-orange-300"
               }`}
             >
               Services
@@ -60,7 +82,11 @@ export function Header() {
             <Link
               href="/equipments"
               className={`transition-colors duration-300 ${
-                scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                pathname === "/equipments" 
+                  ? "text-orange-500" 
+                  : scrolled 
+                    ? "text-gray-700 hover:text-orange-500" 
+                    : "text-white hover:text-orange-300"
               }`}
             >
               Equipments
@@ -68,7 +94,11 @@ export function Header() {
             <Link
               href="/sample-projects"
               className={`transition-colors duration-300 ${
-                scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                pathname === "/sample-projects" 
+                  ? "text-orange-500" 
+                  : scrolled 
+                    ? "text-gray-700 hover:text-orange-500" 
+                    : "text-white hover:text-orange-300"
               }`}
             >
               Sample Projects
@@ -76,7 +106,11 @@ export function Header() {
             <Link
               href="/contact"
               className={`transition-colors duration-300 ${
-                scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                pathname === "/contact" 
+                  ? "text-orange-500" 
+                  : scrolled 
+                    ? "text-gray-700 hover:text-orange-500" 
+                    : "text-white hover:text-orange-300"
               }`}
             >
               Contact
@@ -105,9 +139,25 @@ export function Header() {
               }`}
             >
               <Link
+                href="/"
+                className={`block px-3 py-2 transition-colors duration-300 ${
+                  pathname === "/" 
+                    ? "text-orange-500" 
+                    : scrolled 
+                      ? "text-gray-700 hover:text-orange-500" 
+                      : "text-white hover:text-orange-300"
+                }`}
+              >
+                Home
+              </Link>
+              <Link
                 href="/about"
                 className={`block px-3 py-2 transition-colors duration-300 ${
-                  scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                  pathname === "/about" 
+                    ? "text-orange-500" 
+                    : scrolled 
+                      ? "text-gray-700 hover:text-orange-500" 
+                      : "text-white hover:text-orange-300"
                 }`}
               >
                 About
@@ -115,7 +165,11 @@ export function Header() {
               <Link
                 href="/services"
                 className={`block px-3 py-2 transition-colors duration-300 ${
-                  scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                  pathname === "/services" 
+                    ? "text-orange-500" 
+                    : scrolled 
+                      ? "text-gray-700 hover:text-orange-500" 
+                      : "text-white hover:text-orange-300"
                 }`}
               >
                 Services
@@ -123,7 +177,11 @@ export function Header() {
               <Link
                 href="/equipments"
                 className={`block px-3 py-2 transition-colors duration-300 ${
-                  scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                  pathname === "/equipments" 
+                    ? "text-orange-500" 
+                    : scrolled 
+                      ? "text-gray-700 hover:text-orange-500" 
+                      : "text-white hover:text-orange-300"
                 }`}
               >
                 Equipments
@@ -131,7 +189,11 @@ export function Header() {
               <Link
                 href="/sample-projects"
                 className={`block px-3 py-2 transition-colors duration-300 ${
-                  scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                  pathname === "/sample-projects" 
+                    ? "text-orange-500" 
+                    : scrolled 
+                      ? "text-gray-700 hover:text-orange-500" 
+                      : "text-white hover:text-orange-300"
                 }`}
               >
                 Sample Projects
@@ -139,7 +201,11 @@ export function Header() {
               <Link
                 href="/contact"
                 className={`block px-3 py-2 transition-colors duration-300 ${
-                  scrolled ? "text-gray-700 hover:text-orange-500" : "text-white hover:text-orange-300"
+                  pathname === "/contact" 
+                    ? "text-orange-500" 
+                    : scrolled 
+                      ? "text-gray-700 hover:text-orange-500" 
+                      : "text-white hover:text-orange-300"
                 }`}
               >
                 Contact
