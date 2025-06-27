@@ -26,7 +26,7 @@ export function Header() {
         scrolled ? "bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm" : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
             <Link href="/" className="block">
@@ -82,10 +82,6 @@ export function Header() {
               Contact
             </Link>
           </nav>
-
-          <div className="hidden md:block">
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white">Get Quote</Button>
-          </div>
 
           <div className="md:hidden">
             <Button
@@ -148,9 +144,6 @@ export function Header() {
               >
                 Contact
               </Link>
-              <div className="px-3 py-2">
-                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Get Quote</Button>
-              </div>
             </div>
           </div>
         )}

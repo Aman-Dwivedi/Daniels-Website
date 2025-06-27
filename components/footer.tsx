@@ -14,7 +14,7 @@ export function Footer() {
               alt="The Daniels Company"
               width={200}
               height={50}
-              className="h-8 w-auto mb-4 brightness-0 invert"
+              className="h-8 w-auto mb-4 brightness-0 invert -ml-11"
             />
             <p className="text-gray-300 mb-6 max-w-md">
               Leading coal processing solutions with over 70 years of experience. We deliver innovative, efficient, and

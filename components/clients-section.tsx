@@ -27,7 +27,8 @@ export function ClientsSection() {
   const infiniteClients = [...clients, ...clients]
 
   const officeLocations = [
-    { name: "Bluefield, WV", country: "United States", x: "22%", y: "32%", label: "Bluefield, USA", labelDirection: "left", labelOffset: "120px", labelX: "10%", labelY: "32%" },
+    { name: "Bluefield, WV", country: "United States", x: "22%", y: "32%", label: "Bluefield, USA", labelDirection: "left", labelOffset: "120px", labelX: "10%", labelY: "25%" },
+    { name: "Charlotte, NC", country: "United States", x: "22.5%", y: "32.5%", label: "Charlotte, USA", labelDirection: "left", labelOffset: "120px", labelX: "10%", labelY: "40%" },
     { name: "Beijing", country: "China", x: "77%", y: "30%", label: "Beijing, China", labelDirection: "right", labelOffset: "100px", labelX: "85%", labelY: "30%" },
     { name: "New Delhi", country: "India", x: "67%", y: "38%", label: "New Delhi, India", labelDirection: "right", labelOffset: "110px", labelX: "80%", labelY: "38%" },
     { name: "Ankara", country: "Turkey", x: "54%", y: "29%", label: "Ankara, Turkey", labelDirection: "left", labelOffset: "100px", labelX: "40%", labelY: "35%" },
