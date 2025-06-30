@@ -53,6 +53,12 @@ export function NewsModal({ article, isOpen, onClose }: NewsModalProps) {
 
   if (!isOpen || !article) return null
 
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`;
+    }
+    return imagePath;
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div 
@@ -76,7 +82,7 @@ export function NewsModal({ article, isOpen, onClose }: NewsModalProps) {
             <div className="mb-4">
               <p className="text-sm text-gray-500 mb-4">{article.date}</p>
               <img
-                src={article.image || "/placeholder.svg"}
+                src={getImageUrl(article.image) || "/placeholder.svg"}
                 alt={article.title}
                 className="w-full h-64 object-cover rounded-lg mb-6"
               />

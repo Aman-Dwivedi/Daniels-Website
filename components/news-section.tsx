@@ -59,7 +59,12 @@ export function NewsSection() {
     setIsModalOpen(false)
     setSelectedArticle(null)
   }
-
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`;
+    }
+    return imagePath;
+  };
   if (loading) {
     return (
       <section id="news" className="py-20 bg-white">
@@ -112,7 +117,7 @@ export function NewsSection() {
               <Card key={article._id} className="hover:shadow-lg transition-shadow cursor-pointer group">
                 <div className="relative overflow-hidden">
                   <img
-                    src={article.image || "/placeholder.svg"}
+                    src={getImageUrl(article.image) || "/placeholder.svg"}
                     alt={article.title}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
