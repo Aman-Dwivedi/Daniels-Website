@@ -1,106 +1,120 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MapPin, Zap } from "lucide-react"
+import { ProjectModal } from "@/components/project-modal"
+
+interface Project {
+  _id: string
+  title: string
+  location: string
+  year: string
+  capacity: string
+  description: string
+  detailedDescription: string
+  image: string
+  highlights: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
 
 export default function SampleProjectsPage() {
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
-  const projects = [
-    {
-      title: "West Virginia Processing Plant",
-      location: "Charleston, WV, USA",
-      year: "2024",
-      capacity: "2.5M tons/year",
-      description:
-        "Complete turn-key coal processing facility featuring advanced separation technology and environmental controls.",
-      image: "/placeholder.svg?height=300&width=500&text=WV+Processing+Plant",
-      highlights: [
-        "Advanced dense medium separation",
-        "Automated quality control systems",
-        "40% water consumption reduction",
-        "Zero liquid discharge system",
-      ],
-    },
-    {
-      title: "Queensland Coal Preparation Plant",
-      location: "Queensland, Australia",
-      year: "2023",
-      capacity: "3.2M tons/year",
-      description: "Major upgrade and expansion of existing coal preparation facility with state-of-the-art equipment.",
-      image: "/placeholder.svg?height=300&width=500&text=Queensland+Plant",
-      highlights: [
-        "Spiral separator installation",
-        "New screening systems",
-        "Improved product quality",
-        "25% efficiency increase",
-      ],
-    },
-    {
-      title: "Johannesburg Processing Complex",
-      location: "Johannesburg, South Africa",
-      year: "2023",
-      capacity: "1.8M tons/year",
-      description: "New coal processing complex serving multiple mining operations in the region.",
-      image: "/placeholder.svg?height=300&width=500&text=Johannesburg+Complex",
-      highlights: [
-        "Multi-feed processing capability",
-        "Centralized control systems",
-        "Modular plant design",
-        "Rapid deployment construction",
-      ],
-    },
-    {
-      title: "Pennsylvania Plant Modernization",
-      location: "Pittsburgh, PA, USA",
-      year: "2022",
-      capacity: "1.5M tons/year",
-      description: "Complete modernization of legacy coal processing facility with cutting-edge technology.",
-      image: "/placeholder.svg?height=300&width=500&text=Pennsylvania+Plant",
-      highlights: [
-        "Legacy system upgrade",
-        "New flotation circuits",
-        "Digital monitoring systems",
-        "Environmental compliance",
-      ],
-    },
-    {
-      title: "Indonesian Coal Processing Hub",
-      location: "Kalimantan, Indonesia",
-      year: "2022",
-      capacity: "4.0M tons/year",
-      description: "Large-scale coal processing hub designed to serve multiple mining concessions.",
-      image: "/placeholder.svg?height=300&width=500&text=Indonesian+Hub",
-      highlights: [
-        "High-capacity processing",
-        "Multi-product capability",
-        "Advanced logistics integration",
-        "Sustainable design principles",
-      ],
-    },
-    {
-      title: "Colombian Export Facility",
-      location: "Cesar, Colombia",
-      year: "2021",
-      capacity: "2.8M tons/year",
-      description: "Export-focused coal processing facility with port connectivity and quality optimization.",
-      image: "/placeholder.svg?height=300&width=500&text=Colombian+Facility",
-      highlights: [
-        "Export quality optimization",
-        "Port integration systems",
-        "Blending capabilities",
-        "Quality assurance protocols",
-      ],
-    },
-  ]
+  // Fetch projects from API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`)
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects')
+        }
+        
+        const projectsData = await response.json()
+        setProjects(projectsData)
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching projects:', err)
+        setError('Failed to load projects. Please try again later.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [])
+
+  const handleViewDetails = (project: Project) => {
+    setSelectedProject(project)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedProject(null)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Loading our portfolio of successful coal processing projects...
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-600">Loading projects...</p>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Each project represents our commitment to delivering innovative solutions.
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-red-600">{error}</p>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
+    <>
     <div className="min-h-screen bg-white">
       <Header />
 
@@ -150,8 +164,8 @@ export default function SampleProjectsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.map((project, index) => (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300 group overflow-hidden">
+              {projects.map((project) => (
+                <Card key={project._id} className="hover:shadow-lg transition-all duration-300 group overflow-hidden">
                 <div className="relative overflow-hidden">
                   <img
                     src={project.image || "/placeholder.svg"}
@@ -189,7 +203,12 @@ export default function SampleProjectsPage() {
                     </ul>
                   </div>
 
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">View Project Details</Button>
+                    <Button 
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                      onClick={() => handleViewDetails(project)}
+                    >
+                      View Project Details
+                    </Button>
                 </CardContent>
               </Card>
             ))}
@@ -228,5 +247,8 @@ export default function SampleProjectsPage() {
 
       <Footer />
     </div>
+
+      <ProjectModal project={selectedProject} isOpen={isModalOpen} onClose={handleCloseModal} />
+    </>
   )
 }

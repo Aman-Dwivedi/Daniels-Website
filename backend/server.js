@@ -6,6 +6,7 @@ const connectDB = require('./config/database');
 const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
 const newsRoutes = require('./routes/news');
+const projectRoutes = require('./routes/projects');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/news', newsRoutes);
+app.use('/api/projects', projectRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {
