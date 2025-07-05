@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const { authenticateToken } = require('../middleware/auth');
 const News = require('../models/News');
+const Project = require('../models/Project');
 const router = express.Router();
 
 // Ensure uploads directory exists
@@ -12,7 +13,7 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Configure multer for image uploads
+// Configure multer for image uploads (updated to handle both news and projects)
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadsDir);
@@ -20,7 +21,9 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     // Generate unique filename with timestamp
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'news-' + uniqueSuffix + path.extname(file.originalname));
+    // Determine prefix based on the route
+    const prefix = req.originalUrl.includes('/projects') ? 'project' : 'news';
+    cb(null, prefix + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
 
@@ -238,6 +241,154 @@ router.delete('/news/:id', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Error deleting news:', error);
     res.status(500).json({ error: 'Failed to delete news article' });
+  }
+});
+
+// =============== PROJECT MANAGEMENT ROUTES ===============
+
+// Get all projects for admin
+router.get('/projects', authenticateToken, async (req, res) => {
+  try {
+    const projects = await Project.find({})
+      .sort({ year: -1 });
+    
+    res.json(projects);
+  } catch (error) {
+    console.error('Error fetching admin projects:', error);
+    res.status(500).json({ error: 'Failed to fetch projects' });
+  }
+});
+
+// Update a project
+router.put('/projects/:id', authenticateToken, upload.single('image'), async (req, res) => {
+  try {
+    const { title, location, year, capacity, description, detailedDescription, highlights, existingImage } = req.body;
+    
+    if (!title || !location || !year || !capacity || !description || !detailedDescription) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    // Parse highlights (comes as JSON string)
+    let parsedHighlights;
+    try {
+      parsedHighlights = typeof highlights === 'string' ? JSON.parse(highlights) : highlights;
+    } catch (error) {
+      return res.status(400).json({ error: 'Invalid highlights format' });
+    }
+
+    // Determine which image to use
+    let imagePath;
+    if (req.file) {
+      // New image uploaded
+      imagePath = `/uploads/${req.file.filename}`;
+      
+      // Optionally delete old image if it was an uploaded file
+      const existingProject = await Project.findById(req.params.id);
+      if (existingProject && existingProject.image && existingProject.image.startsWith('/uploads/')) {
+        const oldImagePath = path.join(__dirname, '..', existingProject.image);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+    } else if (existingImage) {
+      // Keep existing image
+      imagePath = existingImage;
+    } else {
+      return res.status(400).json({ error: 'Image is required' });
+    }
+    
+    const updatedProject = await Project.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: title.trim(),
+        location: location.trim(),
+        year: year.trim(),
+        capacity: capacity.trim(),
+        description: description.trim(),
+        detailedDescription: detailedDescription.trim(),
+        image: imagePath,
+        highlights: parsedHighlights,
+        isActive: true // Always set to active
+      },
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedProject) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    
+    res.json(updatedProject);
+  } catch (error) {
+    console.error('Error updating project:', error);
+    res.status(500).json({ error: 'Failed to update project' });
+  }
+});
+
+// Create a new project
+router.post('/projects', authenticateToken, upload.single('image'), async (req, res) => {
+  try {
+    const { title, location, year, capacity, description, detailedDescription, highlights } = req.body;
+    
+    if (!title || !location || !year || !capacity || !description || !detailedDescription) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Image is required' });
+    }
+
+    // Parse highlights
+    let parsedHighlights;
+    try {
+      parsedHighlights = typeof highlights === 'string' ? JSON.parse(highlights) : highlights;
+    } catch (error) {
+      return res.status(400).json({ error: 'Invalid highlights format' });
+    }
+
+    const imagePath = `/uploads/${req.file.filename}`;
+    
+    const newProject = new Project({
+      title: title.trim(),
+      location: location.trim(),
+      year: year.trim(),
+      capacity: capacity.trim(),
+      description: description.trim(),
+      detailedDescription: detailedDescription.trim(),
+      image: imagePath,
+      highlights: parsedHighlights,
+      isActive: true
+    });
+    
+    await newProject.save();
+    res.status(201).json(newProject);
+  } catch (error) {
+    console.error('Error creating project:', error);
+    res.status(500).json({ error: 'Failed to create project' });
+  }
+});
+
+// Delete a project
+router.delete('/projects/:id', authenticateToken, async (req, res) => {
+  try {
+    const projectToDelete = await Project.findById(req.params.id);
+    
+    if (!projectToDelete) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Delete associated image file if it's an uploaded file
+    if (projectToDelete.image && projectToDelete.image.startsWith('/uploads/')) {
+      const imagePath = path.join(__dirname, '..', projectToDelete.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    await Project.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    res.status(500).json({ error: 'Failed to delete project' });
   }
 });
 

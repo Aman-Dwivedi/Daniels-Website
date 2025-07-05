@@ -69,6 +69,13 @@ export default function SampleProjectsPage() {
     setSelectedProject(null)
   }
 
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`
+    }
+    return imagePath
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -168,7 +175,7 @@ export default function SampleProjectsPage() {
                 <Card key={project._id} className="hover:shadow-lg transition-all duration-300 group overflow-hidden">
                 <div className="relative overflow-hidden">
                   <img
-                    src={project.image || "/placeholder.svg"}
+                    src={getImageUrl(project.image) || "/placeholder.svg"}
                     alt={project.title}
                     className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                   />

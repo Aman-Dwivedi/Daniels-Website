@@ -160,7 +160,7 @@ export function ClientsSection() {
           </div>
 
           {/* World Map with Office Locations */}
-          <div className="relative max-w-5xl mx-auto">
+          <div className="relative max-w-5xl mx-auto hidden md:block">
             <div className="relative">
               <img src="/images/world-map.png" alt="World Map" className="w-full h-auto" />
 

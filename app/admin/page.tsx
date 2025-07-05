@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { RefreshCw, Server, Clock, Activity, LogOut, User, Edit, Save, X, Newspaper, Upload, Image as ImageIcon } from 'lucide-react';
+import { RefreshCw, Server, Clock, Activity, LogOut, User, Edit, Save, X, Newspaper, Upload, Image as ImageIcon, FolderOpen } from 'lucide-react';
 
 interface AdminMessage {
   title: string;
@@ -52,6 +52,21 @@ interface NewsArticle {
   updatedAt: string;
 }
 
+interface Project {
+  _id: string;
+  title: string;
+  location: string;
+  year: string;
+  capacity: string;
+  description: string;
+  detailedDescription: string;
+  image: string;
+  highlights: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function AdminPage() {
   const [message, setMessage] = useState<AdminMessage | null>(null);
   const [status, setStatus] = useState<ServerStatus | null>(null);
@@ -67,6 +82,13 @@ export default function AdminPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
+  const [projectSelectedFile, setProjectSelectedFile] = useState<File | null>(null);
+  const [projectImagePreview, setProjectImagePreview] = useState<string | null>(null);
+  const projectFileInputRef = useRef<HTMLInputElement>(null);
 
   const getAuthToken = () => {
     return localStorage.getItem('adminToken');
@@ -150,6 +172,37 @@ export default function AdminPage() {
     }
   };
 
+  const fetchProjects = async () => {
+    setProjectsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.push('/admin/login');
+      return;
+    }
+
+    try {
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await fetch('http://localhost:5000/api/admin/projects', { headers });
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          logout();
+          return;
+        }
+        throw new Error('Failed to fetch projects');
+      }
+      const projectsData = await response.json();
+      setProjects(projectsData);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
   const saveNews = async (article: NewsArticle) => {
     setSaveLoading(true);
     const token = getAuthToken();
@@ -223,6 +276,56 @@ export default function AdminPage() {
     }
   };
 
+  const saveProject = async (project: Project) => {
+    setSaveLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.push('/admin/login');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('title', project.title);
+      formData.append('location', project.location);
+      formData.append('year', project.year);
+      formData.append('capacity', project.capacity);
+      formData.append('description', project.description);
+      formData.append('detailedDescription', project.detailedDescription);
+      formData.append('highlights', JSON.stringify(project.highlights));
+      
+      if (projectSelectedFile) {
+        formData.append('image', projectSelectedFile);
+      } else {
+        formData.append('existingImage', project.image);
+      }
+
+      const response = await fetch(`http://localhost:5000/api/admin/projects/${project._id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save project');
+      }
+
+      const updatedProject = await response.json();
+      setProjects(prev => prev.map(p => p._id === updatedProject._id ? updatedProject : p));
+      setIsProjectDialogOpen(false);
+      setEditingProject(null);
+      setProjectSelectedFile(null);
+      setProjectImagePreview(null);
+    } catch (err) {
+      console.error('Error saving project:', err);
+      alert('Failed to save project');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
   useEffect(() => {
     verifyToken();
   }, []);
@@ -231,6 +334,7 @@ export default function AdminPage() {
     if (user) {
       fetchData();
       fetchNews();
+      fetchProjects();
     }
   }, [user]);
 
@@ -286,6 +390,37 @@ export default function AdminPage() {
       return `http://localhost:5000${imagePath}`;
     }
     return imagePath;
+  };
+
+  const handleEditProject = (project: Project) => {
+    setEditingProject({ ...project });
+    setProjectSelectedFile(null);
+    setProjectImagePreview(null);
+    setIsProjectDialogOpen(true);
+  };
+
+  const handleProjectInputChange = (field: keyof Project, value: string | string[]) => {
+    if (editingProject) {
+      setEditingProject({ ...editingProject, [field]: value });
+    }
+  };
+
+  const handleProjectFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setProjectSelectedFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProjectImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProjectImageClick = () => {
+    projectFileInputRef.current?.click();
   };
 
   if (!user) {
@@ -530,6 +665,70 @@ export default function AdminPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Projects Management Card */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-xl">Project Management</CardTitle>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchProjects}
+                disabled={projectsLoading}
+              >
+                {projectsLoading ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {projectsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw className="h-8 w-8 animate-spin text-slate-400" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {projects.map((project) => (
+                    <div key={project._id} className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-800">
+                      <div className="flex items-start gap-3">
+                        <img
+                          src={getImageUrl(project.image)}
+                          alt={project.title}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate">
+                            {project.title}
+                          </h4>
+                          <p className="text-sm text-slate-500 mb-1">{project.location} • {project.year}</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
+                            {project.description}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center mt-3">
+                        <span className="text-xs text-slate-500">{project.capacity}</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditProject(project)}
+                          className="gap-1"
+                        >
+                          <Edit className="h-3 w-3" />
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
@@ -634,6 +833,158 @@ export default function AdminPage() {
                 </Button>
                 <Button
                   onClick={handleSaveNews}
+                  disabled={saveLoading}
+                >
+                  {saveLoading ? (
+                    <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-1" />
+                  )}
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Project Dialog */}
+      <Dialog open={isProjectDialogOpen} onOpenChange={setIsProjectDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+            <DialogDescription>
+              Update the project information. All fields are required.
+            </DialogDescription>
+          </DialogHeader>
+          {editingProject && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="project-title">Title</Label>
+                <Input
+                  id="project-title"
+                  value={editingProject.title}
+                  onChange={(e) => handleProjectInputChange('title', e.target.value)}
+                  placeholder="Enter project title"
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="project-location">Location</Label>
+                  <Input
+                    id="project-location"
+                    value={editingProject.location}
+                    onChange={(e) => handleProjectInputChange('location', e.target.value)}
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-year">Year</Label>
+                  <Input
+                    id="project-year"
+                    value={editingProject.year}
+                    onChange={(e) => handleProjectInputChange('year', e.target.value)}
+                    placeholder="Enter year"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-capacity">Capacity</Label>
+                  <Input
+                    id="project-capacity"
+                    value={editingProject.capacity}
+                    onChange={(e) => handleProjectInputChange('capacity', e.target.value)}
+                    placeholder="Enter capacity"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="project-description">Description</Label>
+                <Textarea
+                  id="project-description"
+                  value={editingProject.description}
+                  onChange={(e) => handleProjectInputChange('description', e.target.value)}
+                  placeholder="Enter project description"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="project-detailed">Detailed Description</Label>
+                <Textarea
+                  id="project-detailed"
+                  value={editingProject.detailedDescription}
+                  onChange={(e) => handleProjectInputChange('detailedDescription', e.target.value)}
+                  placeholder="Enter detailed description"
+                  rows={6}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="project-highlights">Highlights (one per line)</Label>
+                <Textarea
+                  id="project-highlights"
+                  value={editingProject.highlights.join('\n')}
+                  onChange={(e) => handleProjectInputChange('highlights', e.target.value.split('\n').filter(h => h.trim()))}
+                  placeholder="Enter project highlights, one per line"
+                  rows={4}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="project-image">Project Image</Label>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      type="button" 
+                      onClick={handleProjectImageClick}
+                      variant="outline"
+                      className="gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Choose New Image
+                    </Button>
+                    <span className="text-sm text-slate-500">
+                      {projectSelectedFile ? projectSelectedFile.name : 'or keep current image'}
+                    </span>
+                  </div>
+                  <input
+                    ref={projectFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProjectFileChange}
+                    className="hidden"
+                  />
+                  <div className="border rounded-lg p-3 bg-slate-50 dark:bg-slate-800">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ImageIcon className="h-4 w-4" />
+                      <span className="text-sm font-medium">Preview</span>
+                    </div>
+                    <img 
+                      src={projectImagePreview || getImageUrl(editingProject.image)} 
+                      alt="Preview"
+                      className="w-full h-48 object-cover rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsProjectDialogOpen(false);
+                    setProjectSelectedFile(null);
+                    setProjectImagePreview(null);
+                  }}
+                  disabled={saveLoading}
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => editingProject && saveProject(editingProject)}
                   disabled={saveLoading}
                 >
                   {saveLoading ? (
