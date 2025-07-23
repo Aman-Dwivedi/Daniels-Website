@@ -111,13 +111,14 @@ export default function AdminPage() {
     }
 
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
 
       // Fetch admin message
-      const messageResponse = await fetch('http://localhost:5000/api/admin/message', { headers });
+      const messageResponse = await fetch(`${apiUrl}/api/admin/message`, { headers });
       if (!messageResponse.ok) {
         if (messageResponse.status === 401 || messageResponse.status === 403) {
           logout();
@@ -129,7 +130,7 @@ export default function AdminPage() {
       setMessage(messageData);
 
       // Fetch server status
-      const statusResponse = await fetch('http://localhost:5000/api/admin/status', { headers });
+      const statusResponse = await fetch(`${apiUrl}/api/admin/status`, { headers });
       if (statusResponse.ok) {
         const statusData = await statusResponse.json();
         setStatus(statusData);
@@ -150,12 +151,13 @@ export default function AdminPage() {
     }
 
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
 
-      const response = await fetch('http://localhost:5000/api/admin/news', { headers });
+      const response = await fetch(`${apiUrl}/api/admin/news`, { headers });
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
           logout();
@@ -181,12 +183,13 @@ export default function AdminPage() {
     }
 
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
 
-      const response = await fetch('http://localhost:5000/api/admin/projects', { headers });
+      const response = await fetch(`${apiUrl}/api/admin/projects`, { headers });
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
           logout();
@@ -212,6 +215,7 @@ export default function AdminPage() {
     }
 
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const formData = new FormData();
       formData.append('title', article.title);
       formData.append('excerpt', article.excerpt);
@@ -224,7 +228,7 @@ export default function AdminPage() {
         formData.append('existingImage', article.image);
       }
 
-      const response = await fetch(`http://localhost:5000/api/admin/news/${article._id}`, {
+      const response = await fetch(`${apiUrl}/api/admin/news/${article._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -258,7 +262,8 @@ export default function AdminPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/auth/verify`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -285,6 +290,7 @@ export default function AdminPage() {
     }
 
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const formData = new FormData();
       formData.append('title', project.title);
       formData.append('location', project.location);
@@ -300,7 +306,7 @@ export default function AdminPage() {
         formData.append('existingImage', project.image);
       }
 
-      const response = await fetch(`http://localhost:5000/api/admin/projects/${project._id}`, {
+      const response = await fetch(`${apiUrl}/api/admin/projects/${project._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
