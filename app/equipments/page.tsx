@@ -1,13 +1,25 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Settings, Zap, Gauge, Wrench, Factory, Cog } from "lucide-react"
+import { EquipmentModal } from "@/components/equipment-modal"
+
+interface Equipment {
+  icon: any
+  title: string
+  description: string
+  equipment: string[]
+  image: string
+}
 
 export default function EquipmentsPage() {
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -57,141 +69,160 @@ export default function EquipmentsPage() {
     },
   ]
 
+  const handleViewDetails = (equipment: Equipment) => {
+    setSelectedEquipment(equipment)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedEquipment(null)
+  }
+
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
+    <>
+      <div className="min-h-screen bg-white">
+        <Header />
 
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Parallax Effect */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('/images/equipment-background.jpg')`,
-            backgroundAttachment: 'fixed',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center center',
-          }}
-        >
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Equipment <span className="text-orange-500">Solutions</span>
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-            Industry-leading coal processing equipment from trusted global manufacturers, backed by our technical
-            expertise and support.
-          </p>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white rounded-full mt-2"></div>
+        {/* Hero Section */}
+        <section className="relative h-screen flex items-center justify-center overflow-hidden">
+          {/* Background Image with Parallax Effect */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('/images/equipment-background.jpg')`,
+              backgroundAttachment: 'fixed',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center center',
+            }}
+          >
+            <div className="absolute inset-0 bg-black/60"></div>
           </div>
-        </div>
-      </section>
 
-      {/* Equipment Categories */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Equipment Categories</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We supply and support a comprehensive range of coal processing equipment to meet all your operational
-              needs.
+          {/* Content */}
+          <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              Equipment <span className="text-orange-500">Solutions</span>
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
+              Industry-leading coal processing equipment from trusted global manufacturers, backed by our technical
+              expertise and support.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {equipmentCategories.map((category, index) => (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300 group">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={category.image || "/placeholder.svg"}
-                    alt={category.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-orange-500 transition-colors">
-                    <category.icon className="h-6 w-6 text-orange-500 group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{category.title}</h3>
-                  <p className="text-gray-600 mb-4">{category.description}</p>
-                  <ul className="space-y-2 mb-6">
-                    {category.equipment.map((item, itemIndex) => (
-                      <li key={itemIndex} className="text-sm text-gray-700 flex items-center">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">View Details</Button>
-                </CardContent>
-              </Card>
-            ))}
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+              <div className="w-1 h-3 bg-white rounded-full mt-2"></div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Why Choose Our Equipment?</h2>
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white font-bold text-sm">1</span>
+        {/* Equipment Categories */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Equipment Categories</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                We supply and support a comprehensive range of coal processing equipment to meet all your operational
+                needs.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {equipmentCategories.map((category, index) => (
+                <Card key={index} className="hover:shadow-lg transition-all duration-300 group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={category.image || "/placeholder.svg"}
+                      alt={category.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Premium Quality</h3>
-                    <p className="text-gray-600">
-                      All equipment sourced from leading global manufacturers with proven track records.
-                    </p>
+                  <CardContent className="p-6">
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-orange-500 transition-colors">
+                      <category.icon className="h-6 w-6 text-orange-500 group-hover:text-white transition-colors" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">{category.title}</h3>
+                    <p className="text-gray-600 mb-4">{category.description}</p>
+                    <ul className="space-y-2 mb-6">
+                      {category.equipment.map((item, itemIndex) => (
+                        <li key={itemIndex} className="text-sm text-gray-700 flex items-center">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                      onClick={() => handleViewDetails(category)}
+                    >
+                      Learn More
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Why Choose Our Equipment?</h2>
+                <div className="space-y-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-white font-bold text-sm">1</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Premium Quality</h3>
+                      <p className="text-gray-600">
+                        All equipment sourced from leading global manufacturers with proven track records.
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white font-bold text-sm">2</span>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-white font-bold text-sm">2</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Technical Support</h3>
+                      <p className="text-gray-600">
+                        Comprehensive technical support and training for optimal equipment performance.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Technical Support</h3>
-                    <p className="text-gray-600">
-                      Comprehensive technical support and training for optimal equipment performance.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white font-bold text-sm">3</span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Custom Solutions</h3>
-                    <p className="text-gray-600">
-                      Equipment configurations tailored to your specific processing requirements.
-                    </p>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-white font-bold text-sm">3</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Custom Solutions</h3>
+                      <p className="text-gray-600">
+                        Equipment configurations tailored to your specific processing requirements.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="relative">
-              <img
-                src="/placeholder.svg?height=400&width=600&text=Equipment+Showcase"
-                alt="Equipment Showcase"
-                className="rounded-lg shadow-lg w-full h-auto"
-              />
+              <div className="relative">
+                <img
+                  src="/placeholder.svg?height=400&width=600&text=Equipment+Showcase"
+                  alt="Equipment Showcase"
+                  className="rounded-lg shadow-lg w-full h-auto"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+
+      <EquipmentModal equipment={selectedEquipment} isOpen={isModalOpen} onClose={handleCloseModal} />
+    </>
   )
 }
