@@ -139,26 +139,6 @@ export function ClientsSection() {
             <p className="text-gray-600">Delivering results that matter across the globe</p>
           </div>
 
-          {/* Statistics Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-12">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-500 mb-2">50+</div>
-              <div className="text-gray-600 font-medium">Global Clients</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-500 mb-2">25</div>
-              <div className="text-gray-600 font-medium">Countries Served</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-500 mb-2">99%</div>
-              <div className="text-gray-600 font-medium">Client Satisfaction</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-500 mb-2">24/7</div>
-              <div className="text-gray-600 font-medium">Support Available</div>
-            </div>
-          </div>
-
           {/* World Map with Office Locations */}
           <div className="relative max-w-5xl mx-auto hidden md:block">
             <div className="relative">

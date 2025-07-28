@@ -20,14 +20,6 @@ export function Footer() {
               Leading coal processing solutions with over 70 years of experience. We deliver innovative, efficient, and
               sustainable processing technologies for the global energy industry.
             </p>
-            <div className="flex space-x-4">
-              <Link href="https://www.instagram.com/tdcdaniels/" className="text-gray-400 hover:text-orange-500 transition-colors">
-                <Instagram className="h-6 w-6" />
-              </Link>
-              <Link href="https://www.linkedin.com/company/the-daniels-co" className="text-gray-400 hover:text-orange-500 transition-colors">
-                <Linkedin className="h-6 w-6" />
-              </Link>
-            </div>
           </div>
 
           {/* Quick Links */}
@@ -65,7 +57,7 @@ export function Footer() {
           {/* Contact Info */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
-            <div className="space-y-3">
+            <div className="space-y-3 mb-6">
               <div className="flex items-center">
                 <MapPin className="h-5 w-5 text-orange-500 mr-3 flex-shrink-0" />
                 <span className="text-gray-300">
@@ -82,6 +74,24 @@ export function Footer() {
                 <Mail className="h-5 w-5 text-orange-500 mr-3 flex-shrink-0" />
                 <span className="text-gray-300">info@daniels-wv.com</span>
               </div>
+            </div>
+            <div className="flex space-x-4">
+              <a 
+                href="https://www.instagram.com/tdcdaniels/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-400 hover:text-orange-500 transition-colors"
+              >
+                <Instagram className="h-6 w-6" />
+              </a>
+              <a 
+                href="https://www.linkedin.com/company/the-daniels-co" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-400 hover:text-orange-500 transition-colors"
+              >
+                <Linkedin className="h-6 w-6" />
+              </a>
             </div>
           </div>
         </div>

@@ -37,7 +37,9 @@ export function Header() {
                 alt="The Daniels Company"
                 width={200}
                 height={50}
-                className={`h-8 w-auto transition-all duration-300 cursor-pointer`}
+                className={`h-8 w-auto transition-all duration-300 cursor-pointer ${
+                  !scrolled ? "brightness-0 invert" : ""
+                }`}
               />
             </Link>
           </div>

@@ -89,15 +89,8 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
             Leading the coal processing industry with innovation, expertise, and unwavering commitment to excellence
-            since 1956.
+            since 1953.
           </p>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white rounded-full mt-2"></div>
-          </div>
         </div>
       </section>
 
@@ -343,41 +336,6 @@ export default function AboutPage() {
                 </Card>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Leadership Team */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Leadership Team</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Meet the experienced professionals who guide our company's vision and strategy.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { name: "John R. Cassey II", role: "President", experience: "25+ years in coal processing" },
-              {
-                name: "Zhigang Wang, P.E.",
-                role: "Vice President",
-                experience: "20+ years in industrial operations",
-              },
-              { name: "Dona Casey", role: "Vesel Parts Sales", experience: "15+ years in mining technology" },
-            ].map((leader, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Users className="h-12 w-12 text-gray-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{leader.name}</h3>
-                  <p className="text-orange-500 font-medium mb-2">{leader.role}</p>
-                  <p className="text-gray-600 text-sm">{leader.experience}</p>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
