@@ -15,7 +15,7 @@ export function HeroSection() {
     },
     {
       url: '/images/project-background.jpg',
-      alt: 'Sample Projects'
+      alt: 'Projects'
     },
     {
       url: '/images/equipment-background.JPG',

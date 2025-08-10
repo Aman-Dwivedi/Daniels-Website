@@ -103,7 +103,7 @@ export function Header() {
                     : "text-white hover:text-orange-300"
               }`}
             >
-              Sample Projects
+              Projects
             </Link>
             <Link
               href="/contact"
@@ -198,7 +198,7 @@ export function Header() {
                       : "text-white hover:text-orange-300"
                 }`}
               >
-                Sample Projects
+                Projects
               </Link>
               <Link
                 href="/contact"

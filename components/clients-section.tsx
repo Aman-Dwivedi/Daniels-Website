@@ -204,7 +204,7 @@ export function ClientsSection() {
 
             <div className="text-center mt-8">
               <p className="text-sm text-gray-600">
-                Our offices span across 3 continents, ensuring local expertise and global reach for all your coal
+                Our offices and representativesspan across 3 continents, ensuring local expertise and global reach for all your coal
                 processing needs
               </p>
             </div>
