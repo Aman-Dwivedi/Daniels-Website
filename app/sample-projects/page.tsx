@@ -4,28 +4,15 @@ import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { MapPin, Zap } from "lucide-react"
-import { ProjectModal } from "@/components/project-modal"
 
 interface Project {
   _id: string
   title: string
-  location: string
-  year: string
-  capacity: string
-  description: string
-  detailedDescription: string
   image: string
-  highlights: string[]
   isActive: boolean
-  createdAt: string
-  updatedAt: string
 }
 
 export default function SampleProjectsPage() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -58,16 +45,6 @@ export default function SampleProjectsPage() {
 
     fetchProjects()
   }, [])
-
-  const handleViewDetails = (project: Project) => {
-    setSelectedProject(project)
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedProject(null)
-  }
 
   const getImageUrl = (imagePath: string) => {
     if (imagePath.startsWith('/uploads/')) {
@@ -121,7 +98,6 @@ export default function SampleProjectsPage() {
   }
 
   return (
-    <>
     <div className="min-h-screen bg-white">
       <Header />
 
@@ -163,52 +139,18 @@ export default function SampleProjectsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {projects.map((project) => (
-                <Card key={project._id} className="hover:shadow-lg transition-all duration-300 group overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {projects.map((project) => (
+              <Card key={project._id} className="hover:shadow-lg transition-all duration-300 group overflow-hidden">
                 <div className="relative overflow-hidden">
                   <img
                     src={getImageUrl(project.image) || "/placeholder.svg"}
                     alt={project.title}
                     className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {project.year}
-                  </div>
                 </div>
                 <CardContent className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{project.title}</h3>
-
-                  <div className="flex items-center text-gray-600 mb-2">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{project.location}</span>
-                  </div>
-
-                  <div className="flex items-center text-gray-600 mb-4">
-                    <Zap className="h-4 w-4 mr-2" />
-                    <span className="text-sm font-medium">{project.capacity}</span>
-                  </div>
-
-                  <p className="text-gray-600 mb-6">{project.description}</p>
-
-                  <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Key Highlights</h4>
-                    <ul className="space-y-2">
-                      {project.highlights.map((highlight, highlightIndex) => (
-                        <li key={highlightIndex} className="flex items-center text-sm text-gray-700">
-                          <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                          {highlight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                    <Button 
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                      onClick={() => handleViewDetails(project)}
-                    >
-                      View Project Details
-                    </Button>
+                  <h3 className="text-2xl font-bold text-gray-900 text-center">{project.title}</h3>
                 </CardContent>
               </Card>
             ))}
@@ -247,8 +189,5 @@ export default function SampleProjectsPage() {
 
       <Footer />
     </div>
-
-      <ProjectModal project={selectedProject} isOpen={isModalOpen} onClose={handleCloseModal} />
-    </>
   )
 }

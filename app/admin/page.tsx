@@ -55,13 +55,7 @@ interface NewsArticle {
 interface Project {
   _id: string;
   title: string;
-  location: string;
-  year: string;
-  capacity: string;
-  description: string;
-  detailedDescription: string;
   image: string;
-  highlights: string[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -293,12 +287,6 @@ export default function AdminPage() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const formData = new FormData();
       formData.append('title', project.title);
-      formData.append('location', project.location);
-      formData.append('year', project.year);
-      formData.append('capacity', project.capacity);
-      formData.append('description', project.description);
-      formData.append('detailedDescription', project.detailedDescription);
-      formData.append('highlights', JSON.stringify(project.highlights));
       
       if (projectSelectedFile) {
         formData.append('image', projectSelectedFile);
@@ -405,7 +393,7 @@ export default function AdminPage() {
     setIsProjectDialogOpen(true);
   };
 
-  const handleProjectInputChange = (field: keyof Project, value: string | string[]) => {
+  const handleProjectInputChange = (field: keyof Project, value: string) => {
     if (editingProject) {
       setEditingProject({ ...editingProject, [field]: value });
     }
@@ -673,7 +661,7 @@ export default function AdminPage() {
           </Card>
 
           {/* Projects Management Card */}
-          <Card className="lg:col-span-2">
+          <Card className="mt-6">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="flex items-center gap-2">
                 <FolderOpen className="h-5 w-5 text-blue-600" />
@@ -693,32 +681,28 @@ export default function AdminPage() {
               </Button>
             </CardHeader>
             <CardContent>
+              <CardDescription className="mb-4">
+                Manage project names and images. Only the title and image can be edited.
+              </CardDescription>
               {projectsLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <RefreshCw className="h-8 w-8 animate-spin text-slate-400" />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {projects.map((project) => (
                     <div key={project._id} className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-800">
-                      <div className="flex items-start gap-3">
+                      <div className="mb-3">
                         <img
                           src={getImageUrl(project.image)}
                           alt={project.title}
-                          className="w-16 h-16 object-cover rounded"
+                          className="w-full h-40 object-cover rounded"
                         />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate">
-                            {project.title}
-                          </h4>
-                          <p className="text-sm text-slate-500 mb-1">{project.location} • {project.year}</p>
-                          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
-                            {project.description}
-                          </p>
-                        </div>
                       </div>
-                      <div className="flex justify-between items-center mt-3">
-                        <span className="text-xs text-slate-500">{project.capacity}</span>
+                      <div className="text-center">
+                        <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3">
+                          {project.title}
+                        </h4>
                         <Button
                           size="sm"
                           variant="outline"
@@ -856,85 +840,22 @@ export default function AdminPage() {
 
       {/* Edit Project Dialog */}
       <Dialog open={isProjectDialogOpen} onOpenChange={setIsProjectDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Project</DialogTitle>
             <DialogDescription>
-              Update the project information. All fields are required.
+              Update the project title and image. Only these fields can be modified.
             </DialogDescription>
           </DialogHeader>
           {editingProject && (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="project-title">Title</Label>
+                <Label htmlFor="project-title">Project Title</Label>
                 <Input
                   id="project-title"
                   value={editingProject.title}
                   onChange={(e) => handleProjectInputChange('title', e.target.value)}
                   placeholder="Enter project title"
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="project-location">Location</Label>
-                  <Input
-                    id="project-location"
-                    value={editingProject.location}
-                    onChange={(e) => handleProjectInputChange('location', e.target.value)}
-                    placeholder="Enter location"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="project-year">Year</Label>
-                  <Input
-                    id="project-year"
-                    value={editingProject.year}
-                    onChange={(e) => handleProjectInputChange('year', e.target.value)}
-                    placeholder="Enter year"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="project-capacity">Capacity</Label>
-                  <Input
-                    id="project-capacity"
-                    value={editingProject.capacity}
-                    onChange={(e) => handleProjectInputChange('capacity', e.target.value)}
-                    placeholder="Enter capacity"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="project-description">Description</Label>
-                <Textarea
-                  id="project-description"
-                  value={editingProject.description}
-                  onChange={(e) => handleProjectInputChange('description', e.target.value)}
-                  placeholder="Enter project description"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="project-detailed">Detailed Description</Label>
-                <Textarea
-                  id="project-detailed"
-                  value={editingProject.detailedDescription}
-                  onChange={(e) => handleProjectInputChange('detailedDescription', e.target.value)}
-                  placeholder="Enter detailed description"
-                  rows={6}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="project-highlights">Highlights (one per line)</Label>
-                <Textarea
-                  id="project-highlights"
-                  value={editingProject.highlights.join('\n')}
-                  onChange={(e) => handleProjectInputChange('highlights', e.target.value.split('\n').filter(h => h.trim()))}
-                  placeholder="Enter project highlights, one per line"
-                  rows={4}
                 />
               </div>
 

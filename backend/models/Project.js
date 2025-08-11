@@ -6,35 +6,10 @@ const projectSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  location: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  year: {
-    type: String,
-    required: true
-  },
-  capacity: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  detailedDescription: {
-    type: String,
-    required: true
-  },
   image: {
     type: String,
     required: true
   },
-  highlights: [{
-    type: String,
-    required: true
-  }],
   isActive: {
     type: Boolean,
     default: true

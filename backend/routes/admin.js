@@ -250,7 +250,7 @@ router.delete('/news/:id', authenticateToken, async (req, res) => {
 router.get('/projects', authenticateToken, async (req, res) => {
   try {
     const projects = await Project.find({})
-      .sort({ year: -1 });
+      .sort({ createdAt: -1 });
     
     res.json(projects);
   } catch (error) {
@@ -259,21 +259,13 @@ router.get('/projects', authenticateToken, async (req, res) => {
   }
 });
 
-// Update a project
+// Update a project (simplified to only handle title and image)
 router.put('/projects/:id', authenticateToken, upload.single('image'), async (req, res) => {
   try {
-    const { title, location, year, capacity, description, detailedDescription, highlights, existingImage } = req.body;
+    const { title, existingImage } = req.body;
     
-    if (!title || !location || !year || !capacity || !description || !detailedDescription) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-
-    // Parse highlights (comes as JSON string)
-    let parsedHighlights;
-    try {
-      parsedHighlights = typeof highlights === 'string' ? JSON.parse(highlights) : highlights;
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid highlights format' });
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
     }
 
     // Determine which image to use
@@ -301,13 +293,7 @@ router.put('/projects/:id', authenticateToken, upload.single('image'), async (re
       req.params.id,
       {
         title: title.trim(),
-        location: location.trim(),
-        year: year.trim(),
-        capacity: capacity.trim(),
-        description: description.trim(),
-        detailedDescription: detailedDescription.trim(),
         image: imagePath,
-        highlights: parsedHighlights,
         isActive: true // Always set to active
       },
       { new: true, runValidators: true }
@@ -324,38 +310,24 @@ router.put('/projects/:id', authenticateToken, upload.single('image'), async (re
   }
 });
 
-// Create a new project
+// Create a new project (simplified)
 router.post('/projects', authenticateToken, upload.single('image'), async (req, res) => {
   try {
-    const { title, location, year, capacity, description, detailedDescription, highlights } = req.body;
+    const { title } = req.body;
     
-    if (!title || !location || !year || !capacity || !description || !detailedDescription) {
-      return res.status(400).json({ error: 'All fields are required' });
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
     }
 
     if (!req.file) {
       return res.status(400).json({ error: 'Image is required' });
     }
 
-    // Parse highlights
-    let parsedHighlights;
-    try {
-      parsedHighlights = typeof highlights === 'string' ? JSON.parse(highlights) : highlights;
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid highlights format' });
-    }
-
     const imagePath = `/uploads/${req.file.filename}`;
     
     const newProject = new Project({
       title: title.trim(),
-      location: location.trim(),
-      year: year.trim(),
-      capacity: capacity.trim(),
-      description: description.trim(),
-      detailedDescription: detailedDescription.trim(),
       image: imagePath,
-      highlights: parsedHighlights,
       isActive: true
     });
     
