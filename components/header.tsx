@@ -91,7 +91,7 @@ export function Header() {
                     : "text-white hover:text-orange-300"
               }`}
             >
-              Equipments
+              Equipment
             </Link>
             <Link
               href="/sample-projects"

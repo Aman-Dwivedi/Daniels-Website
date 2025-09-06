@@ -60,7 +60,7 @@ export default function SampleProjectsPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Projects</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Loading our portfolio of successful coal processing projects...
               </p>
@@ -82,7 +82,7 @@ export default function SampleProjectsPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Projects</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Each project represents our commitment to delivering innovative solutions.
               </p>
@@ -119,7 +119,7 @@ export default function SampleProjectsPage() {
         {/* Content */}
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Sample <span className="text-orange-500">Projects</span>
+            Featured <span className="text-orange-500">Projects</span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
             Explore our portfolio of successful coal processing projects delivered across the globe, showcasing our
@@ -132,7 +132,7 @@ export default function SampleProjectsPage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Projects</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Each project represents our commitment to delivering innovative, efficient, and sustainable coal
               processing solutions.
