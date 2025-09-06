@@ -5,9 +5,10 @@ const router = express.Router();
 // Get all active projects
 router.get('/', async (req, res) => {
   try {
-    const projects = await Project.find({ isActive: true })
-      .sort({ createdAt: -1 }); // Sort by creation date (newest first)
-    
+    const projects = await Project.findAll({
+      where: { isActive: true },
+      order: [['createdAt', 'DESC']]
+    });
     res.json(projects);
   } catch (error) {
     console.error('Error fetching projects:', error);
@@ -15,4 +16,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

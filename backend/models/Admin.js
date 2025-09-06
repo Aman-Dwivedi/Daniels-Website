@@ -1,44 +1,59 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const { sequelize } = require('../config/database');
 
-const adminSchema = new mongoose.Schema({
+const Admin = sequelize.define('Admin', {
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true
+  },
   username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    unique: true
   },
   password: {
-    type: String,
-    required: true
+    type: DataTypes.STRING(255),
+    allowNull: false
   },
   role: {
-    type: String,
-    default: 'admin'
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    defaultValue: 'admin'
   },
   lastLogin: {
-    type: Date
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
+  tableName: 'admins',
   timestamps: true
 });
 
-// Hash password before saving
-adminSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
+Admin.addHook('beforeCreate', async (admin) => {
+  if (admin.password) {
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
+    admin.password = await bcrypt.hash(admin.password, salt);
   }
 });
 
-// Compare password method
-adminSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+Admin.addHook('beforeUpdate', async (admin) => {
+  if (admin.changed('password')) {
+    const salt = await bcrypt.genSalt(10);
+    admin.password = await bcrypt.hash(admin.password, salt);
+  }
+});
+
+Admin.prototype.comparePassword = async function(candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('Admin', adminSchema); 
+Admin.prototype.toJSON = function() {
+  const values = { ...this.get() };
+  delete values.password;
+  values._id = values.id;
+  return values;
+};
+
+module.exports = Admin;

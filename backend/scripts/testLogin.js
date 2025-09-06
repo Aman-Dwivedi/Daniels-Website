@@ -1,47 +1,36 @@
-const mongoose = require('mongoose');
+const { connectDB } = require('../config/database');
 const Admin = require('../models/Admin');
 require('dotenv').config();
 
-const testLogin = async (username, password) => {
+(async () => {
   try {
-    console.log('Connecting to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected to MongoDB successfully');
-    
-    console.log(`\nTesting login with username: "${username}" and password: "${password}"`);
-    
-    // Find admin by username
-    console.log('Searching for admin with username:', username);
-    const admin = await Admin.findOne({ username });
-    
+    console.log('Connecting to MySQL...');
+    await connectDB();
+
+    const username = process.env.TEST_ADMIN_USER || 'admin';
+    const password = process.env.TEST_ADMIN_PASS || 'password123';
+
+    const admin = await Admin.findOne({ where: { username } });
     if (!admin) {
       console.log('❌ Admin not found with username:', username);
-      mongoose.connection.close();
-      return;
+      process.exit(0);
     }
-    
+
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      console.log('❌ Invalid password for:', username);
+      process.exit(0);
+    }
+
     console.log('✅ Admin found:');
-    console.log('  - ID:', admin._id);
+    console.log('  - ID:', admin.id);
+    console.log('  - _id:', admin.toJSON()._id);
     console.log('  - Username:', admin.username);
     console.log('  - Role:', admin.role);
-    
-    // Check password
-    console.log('\nTesting password...');
-    const isMatch = await admin.comparePassword(password);
-    
-    if (isMatch) {
-      console.log('✅ Password is correct! Login should work.');
-    } else {
-      console.log('❌ Password is incorrect!');
-      console.log('  - Stored hash:', admin.password);
-    }
-    
-    mongoose.connection.close();
+
+    process.exit(0);
   } catch (error) {
     console.error('Error testing login:', error);
-    mongoose.connection.close();
+    process.exit(1);
   }
-};
-
-// Test with the credentials you're using
-testLogin('admin', 'password123'); 
+})();

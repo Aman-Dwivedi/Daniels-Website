@@ -1,34 +1,46 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const newsSchema = new mongoose.Schema({
+const News = sequelize.define('News', {
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true
+  },
   title: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.STRING(255),
+    allowNull: false
   },
   excerpt: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   fullContent: {
-    type: String,
-    required: true
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   image: {
-    type: String,
-    required: true
+    type: DataTypes.STRING(512),
+    allowNull: false
   },
   date: {
-    type: String,
-    required: true
+    type: DataTypes.STRING(50),
+    allowNull: false
   },
   isActive: {
-    type: Boolean,
-    default: true
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
   }
 }, {
+  tableName: 'news',
   timestamps: true
 });
 
-module.exports = mongoose.model('News', newsSchema); 
+News.prototype.toJSON = function() {
+  const values = { ...this.get() };
+  values._id = values.id;
+  return values;
+};
+
+module.exports = News;

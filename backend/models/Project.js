@@ -1,21 +1,34 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const projectSchema = new mongoose.Schema({
+const Project = sequelize.define('Project', {
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true
+  },
   title: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.STRING(255),
+    allowNull: false
   },
   image: {
-    type: String,
-    required: true
+    type: DataTypes.STRING(512),
+    allowNull: false
   },
   isActive: {
-    type: Boolean,
-    default: true
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
   }
 }, {
+  tableName: 'projects',
   timestamps: true
 });
 
-module.exports = mongoose.model('Project', projectSchema); 
+Project.prototype.toJSON = function() {
+  const values = { ...this.get() };
+  values._id = values.id;
+  return values;
+};
+
+module.exports = Project;

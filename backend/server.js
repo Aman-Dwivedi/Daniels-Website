@@ -2,18 +2,27 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
-const connectDB = require('./config/database');
+const { connectDB } = require('./config/database');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Connect to MySQL FIRST
+connectDB().then(() => {
+  // THEN ensure models are registered after connection
+  require('./models/Admin');
+  require('./models/News');
+  require('./models/Project');
+}).catch(error => {
+  console.error('Failed to connect to database:', error);
+  process.exit(1);
+});
+
 const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
 const newsRoutes = require('./routes/news');
 const projectRoutes = require('./routes/projects');
 const contactRoutes = require('./routes/contact');
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Connect to MongoDB
-connectDB();
 
 // Middleware
 app.use(cors());
@@ -36,4 +45,4 @@ app.get('/api/health', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);
-}); 
+});

@@ -1,42 +1,30 @@
-const mongoose = require('mongoose');
+const { connectDB } = require('../config/database');
 const Admin = require('../models/Admin');
 require('dotenv').config();
 
-const verifyAdmin = async () => {
+(async () => {
   try {
-    console.log('Connecting to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected to MongoDB successfully');
-    
-    // Find all admin users
-    const admins = await Admin.find({});
-    console.log('Total admin users found:', admins.length);
-    
+    console.log('Connecting to MySQL...');
+    await connectDB();
+    const admins = await Admin.findAll();
+
     if (admins.length === 0) {
       console.log('No admin users found in the database');
-      mongoose.connection.close();
-      return;
+      process.exit(0);
     }
-    
-    // Check each admin
+
     for (const admin of admins) {
+      const a = admin.toJSON();
       console.log('\n--- Admin User ---');
-      console.log('ID:', admin._id);
-      console.log('Username:', admin.username);
-      console.log('Role:', admin.role);
-      console.log('Created:', admin.createdAt);
-      console.log('Last Login:', admin.lastLogin || 'Never');
-      
-      // Test password
-      const isPasswordValid = await admin.comparePassword('password123');
-      console.log('Password "password123" test:', isPasswordValid ? 'VALID' : 'INVALID');
+      console.log('ID:', a.id);
+      console.log('_id:', a._id);
+      console.log('Username:', a.username);
+      console.log('Role:', a.role);
     }
-    
-    mongoose.connection.close();
+
+    process.exit(0);
   } catch (error) {
     console.error('Error verifying admin:', error);
-    mongoose.connection.close();
+    process.exit(1);
   }
-};
-
-verifyAdmin(); 
+})();
