@@ -1,18 +1,144 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  company: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
 
 export default function ContactPage() {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    company: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Check for required fields
+    Object.entries(formData).forEach(([key, value]) => {
+      if (!value.trim()) {
+        newErrors[key] = 'This field is required';
+      }
+    });
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Validate phone number (basic validation)
+    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    if (formData.phone && !phoneRegex.test(formData.phone.replace(/[\s\-\(\)]/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+
+    // Clear error when user starts typing
+    if (errors[id]) {
+      setErrors(prev => ({
+        ...prev,
+        [id]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Message Sent!",
+          description: "Thank you for your message. We'll get back to you soon.",
+        });
+
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          company: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        throw new Error(data.message || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const offices = [
     {
@@ -77,58 +203,122 @@ export default function ContactPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
               <Card>
                 <CardContent className="p-8">
-                  <form className="space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                          First Name
+                          First Name *
                         </label>
-                        <Input id="firstName" placeholder="John" />
+                        <Input 
+                          id="firstName" 
+                          placeholder="John"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          className={errors.firstName ? "border-red-500" : ""}
+                        />
+                        {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
                       </div>
                       <div>
                         <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                          Last Name
+                          Last Name *
                         </label>
-                        <Input id="lastName" placeholder="Doe" />
+                        <Input 
+                          id="lastName" 
+                          placeholder="Doe"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          className={errors.lastName ? "border-red-500" : ""}
+                        />
+                        {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
                       </div>
                     </div>
 
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
+                        Email Address *
                       </label>
-                      <Input id="email" type="email" placeholder="john.doe@company.com" />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="john.doe@company.com"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className={errors.email ? "border-red-500" : ""}
+                      />
+                      {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </div>
 
                     <div>
                       <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-                        Company
+                        Company *
                       </label>
-                      <Input id="company" placeholder="Your Company Name" />
+                      <Input 
+                        id="company" 
+                        placeholder="Your Company Name"
+                        value={formData.company}
+                        onChange={handleInputChange}
+                        className={errors.company ? "border-red-500" : ""}
+                      />
+                      {errors.company && <p className="text-red-500 text-sm mt-1">{errors.company}</p>}
                     </div>
 
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
+                        Phone Number *
                       </label>
-                      <Input id="phone" placeholder="+1 (555) 123-4567" />
+                      <Input 
+                        id="phone" 
+                        placeholder="+1 (555) 123-4567"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className={errors.phone ? "border-red-500" : ""}
+                      />
+                      {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                     </div>
 
                     <div>
                       <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                        Subject
+                        Subject *
                       </label>
-                      <Input id="subject" placeholder="How can we help you?" />
+                      <Input 
+                        id="subject" 
+                        placeholder="How can we help you?"
+                        value={formData.subject}
+                        onChange={handleInputChange}
+                        className={errors.subject ? "border-red-500" : ""}
+                      />
+                      {errors.subject && <p className="text-red-500 text-sm mt-1">{errors.subject}</p>}
                     </div>
 
                     <div>
                       <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                        Message
+                        Message *
                       </label>
-                      <Textarea id="message" rows={6} placeholder="Tell us about your project requirements..." />
+                      <Textarea 
+                        id="message" 
+                        rows={6} 
+                        placeholder="Tell us about your project requirements..."
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        className={errors.message ? "border-red-500" : ""}
+                      />
+                      {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
                     </div>
 
-                    <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Send Message</Button>
+                    <Button 
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending Message...
+                        </>
+                      ) : (
+                        'Send Message'
+                      )}
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
@@ -144,8 +334,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">Phone</h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
-                    <p className="text-sm text-gray-500">Mon-Fri, 8:00 AM - 6:00 PM EST</p>
+                    <p className="text-gray-600">+1 (304) 327-8161</p>
                   </div>
                 </div>
 
@@ -165,8 +354,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">Address</h3>
-                    <p className="text-gray-600">1234 Industrial Blvd</p>
-                    <p className="text-gray-600">Coal Valley, WV 25301</p>
+                    <p className="text-gray-600">238 Markell Drive</p>
+                    <p className="text-gray-600">Bluefield, WV 24701, USA</p>
                   </div>
                 </div>
               </div>
@@ -177,11 +366,11 @@ export default function ContactPage() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Why Choose Us?</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-500">35+</div>
+                      <div className="text-2xl font-bold text-orange-500">70</div>
                       <div className="text-sm text-gray-600">Years Experience</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-500">500+</div>
+                      <div className="text-2xl font-bold text-orange-500">180</div>
                       <div className="text-sm text-gray-600">Projects Completed</div>
                     </div>
                     <div className="text-center">
