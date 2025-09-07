@@ -10,6 +10,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Phone, Mail, Clock, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
+interface BackgroundImage {
+  id: string;
+  url: string;
+  alt: string;
+  sortOrder?: number;
+}
+
+interface PageContent {
+  description: string;
+  pageName: string;
+}
+
+interface ApiResponse {
+  pageContent: { [key: string]: PageContent };
+  backgroundImages: { [key: string]: BackgroundImage[] };
+}
+
 interface FormData {
   firstName: string;
   lastName: string;
@@ -27,6 +44,8 @@ interface FormErrors {
 export default function ContactPage() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contactContent, setContactContent] = useState<PageContent | null>(null);
+  const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -40,7 +59,52 @@ export default function ContactPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    
+    // Fetch dynamic content
+    const fetchContent = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await fetch(`${apiUrl}/api/page-content`)
+        
+        if (response.ok) {
+          const data: ApiResponse = await response.json()
+          
+          // Set contact page content
+          if (data.pageContent.contact) {
+            setContactContent(data.pageContent.contact)
+          }
+          
+          // Set background image for contact page (use first image if multiple)
+          if (data.backgroundImages.contact && data.backgroundImages.contact.length > 0) {
+            const sortedImages = data.backgroundImages.contact.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+            setBackgroundImage(sortedImages[0])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch page content:', error)
+        // Use fallback content
+        setContactContent({
+          description: 'Ready to discuss your coal processing needs? Get in touch with our expert team today.',
+          pageName: 'Contact'
+        })
+        setBackgroundImage({
+          id: 'default',
+          url: '/images/contact-background.JPG',
+          alt: 'Contact Us'
+        })
+      }
+    }
+
+    fetchContent()
   }, [])
+
+  // Helper function to get image URL
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`;
+    }
+    return imagePath;
+  };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -174,7 +238,7 @@ export default function ContactPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/images/contact-background.JPG')`,
+            backgroundImage: `url('${backgroundImage ? getImageUrl(backgroundImage.url) : '/images/contact-background.JPG'}')`,
             backgroundAttachment: 'fixed',
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
@@ -189,7 +253,7 @@ export default function ContactPage() {
             Contact <span className="text-orange-500">Us</span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-            Ready to discuss your coal processing needs? Get in touch with our expert team today.
+            {contactContent?.description || 'Ready to discuss your coal processing needs? Get in touch with our expert team today.'}
           </p>
         </div>
       </section>

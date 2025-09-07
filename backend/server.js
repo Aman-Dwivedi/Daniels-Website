@@ -13,6 +13,8 @@ connectDB().then(() => {
   require('./models/Admin');
   require('./models/News');
   require('./models/Project');
+  require('./models/PageContent');
+  require('./models/BackgroundImage');
 }).catch(error => {
   console.error('Failed to connect to database:', error);
   process.exit(1);
@@ -23,6 +25,7 @@ const authRoutes = require('./routes/auth');
 const newsRoutes = require('./routes/news');
 const projectRoutes = require('./routes/projects');
 const contactRoutes = require('./routes/contact');
+const pageContentRoutes = require('./routes/pageContent');
 
 // Middleware
 app.use(cors());
@@ -37,6 +40,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api', pageContentRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {

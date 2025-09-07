@@ -8,6 +8,23 @@ import { Button } from "@/components/ui/button"
 import { Settings, Zap, Gauge, Wrench, Factory, Cog } from "lucide-react"
 import { EquipmentModal } from "@/components/equipment-modal"
 
+interface BackgroundImage {
+  id: string;
+  url: string;
+  alt: string;
+  sortOrder?: number;
+}
+
+interface PageContent {
+  description: string;
+  pageName: string;
+}
+
+interface ApiResponse {
+  pageContent: { [key: string]: PageContent };
+  backgroundImages: { [key: string]: BackgroundImage[] };
+}
+
 interface Equipment {
   icon: any
   title: string
@@ -19,10 +36,57 @@ interface Equipment {
 export default function EquipmentsPage() {
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [equipmentContent, setEquipmentContent] = useState<PageContent | null>(null);
+  const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    
+    // Fetch dynamic content
+    const fetchContent = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await fetch(`${apiUrl}/api/page-content`)
+        
+        if (response.ok) {
+          const data: ApiResponse = await response.json()
+          
+          // Set equipment page content
+          if (data.pageContent.equipment) {
+            setEquipmentContent(data.pageContent.equipment)
+          }
+          
+          // Set background image for equipment page (use first image if multiple)
+          if (data.backgroundImages.equipment && data.backgroundImages.equipment.length > 0) {
+            const sortedImages = data.backgroundImages.equipment.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+            setBackgroundImage(sortedImages[0])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch page content:', error)
+        // Use fallback content
+        setEquipmentContent({
+          description: 'State-of-the-art coal processing equipment designed for maximum efficiency and reliability.',
+          pageName: 'Equipment'
+        })
+        setBackgroundImage({
+          id: 'default',
+          url: '/images/equipment-background.JPG',
+          alt: 'Equipment Solutions'
+        })
+      }
+    }
+
+    fetchContent()
   }, [])
+
+  // Helper function to get image URL
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`;
+    }
+    return imagePath;
+  };
 
   const equipmentCategories = [
     {
@@ -90,7 +154,7 @@ export default function EquipmentsPage() {
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url('/images/equipment-background.jpg')`,
+              backgroundImage: `url('${backgroundImage ? getImageUrl(backgroundImage.url) : '/images/equipment-background.JPG'}')`,
               backgroundAttachment: 'fixed',
               backgroundSize: 'cover',
               backgroundPosition: 'center center',
@@ -105,7 +169,7 @@ export default function EquipmentsPage() {
               Equipment <span className="text-orange-500">Solutions</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-              State-of-the-art coal processing equipment designed for maximum efficiency and reliability.
+              {equipmentContent?.description || 'State-of-the-art coal processing equipment designed for maximum efficiency and reliability.'}
             </p>
           </div>
         </section>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { X, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -23,6 +24,7 @@ interface ServiceModalProps {
 
 export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -49,6 +51,14 @@ export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
       document.body.style.overflow = 'unset'
     }
   }, [isOpen, onClose])
+
+  const handleGetQuote = () => {
+    router.push('/contact')
+  }
+
+  const handleContactUs = () => {
+    router.push('/contact')
+  }
 
   if (!isOpen || !service) return null
 
@@ -146,10 +156,17 @@ export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
                   Contact us today to discuss how we can help with your specific requirements.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+                  <Button 
+                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                    onClick={handleGetQuote}
+                  >
                     Get Quote
                   </Button>
-                  <Button variant="outline" className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white">
+                  <Button 
+                    variant="outline" 
+                    className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+                    onClick={handleContactUs}
+                  >
                     Contact Us
                   </Button>
                 </div>

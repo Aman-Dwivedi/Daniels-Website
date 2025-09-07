@@ -1,15 +1,80 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Factory, Zap, Shield, Users, Award, Globe, Clock, Wrench } from "lucide-react"
 
+interface BackgroundImage {
+  id: string;
+  url: string;
+  alt: string;
+  sortOrder?: number;
+}
+
+interface PageContent {
+  description: string;
+  pageName: string;
+}
+
+interface ApiResponse {
+  pageContent: { [key: string]: PageContent };
+  backgroundImages: { [key: string]: BackgroundImage[] };
+}
+
 export default function AboutPage() {
+  const [aboutContent, setAboutContent] = useState<PageContent | null>(null);
+  const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0)
+    
+    // Fetch dynamic content
+    const fetchContent = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await fetch(`${apiUrl}/api/page-content`)
+        
+        if (response.ok) {
+          const data: ApiResponse = await response.json()
+          
+          // Set about page content
+          if (data.pageContent.about) {
+            setAboutContent(data.pageContent.about)
+          }
+          
+          // Set background image for about page (use first image if multiple)
+          if (data.backgroundImages.about && data.backgroundImages.about.length > 0) {
+            const sortedImages = data.backgroundImages.about.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+            setBackgroundImage(sortedImages[0])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch page content:', error)
+        // Use fallback content
+        setAboutContent({
+          description: 'Leading the coal processing industry with innovation, expertise, and unwavering commitment to excellence since 1953.',
+          pageName: 'About'
+        })
+        setBackgroundImage({
+          id: 'default',
+          url: '/images/Daniels.jpg',
+          alt: 'The Daniels Company'
+        })
+      }
+    }
+
+    fetchContent()
   }, [])
+
+  // Helper function to get image URL
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`;
+    }
+    return imagePath;
+  };
 
   const features = [
     {
@@ -73,7 +138,7 @@ export default function AboutPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/images/Daniels.jpg')`,
+            backgroundImage: `url('${backgroundImage ? getImageUrl(backgroundImage.url) : '/images/Daniels.jpg'}')`,
             backgroundAttachment: 'fixed',
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
@@ -88,8 +153,7 @@ export default function AboutPage() {
             The <span className="text-orange-500">Daniels</span> Company
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-            Leading the coal processing industry with innovation, expertise, and unwavering commitment to excellence
-            since 1953.
+            {aboutContent?.description || 'Leading the coal processing industry with innovation, expertise, and unwavering commitment to excellence since 1953.'}
           </p>
         </div>
       </section>
@@ -135,7 +199,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Timeline Section */}
+      {/* Timeline Section - keeping as is since it's static historical data */}
       <section className="pt-10 pb-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 hidden md:block">
           <div className="text-center mb-16">

@@ -5,6 +5,23 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 
+interface BackgroundImage {
+  id: string;
+  url: string;
+  alt: string;
+  sortOrder?: number;
+}
+
+interface PageContent {
+  description: string;
+  pageName: string;
+}
+
+interface ApiResponse {
+  pageContent: { [key: string]: PageContent };
+  backgroundImages: { [key: string]: BackgroundImage[] };
+}
+
 interface Project {
   _id: string
   title: string
@@ -16,9 +33,49 @@ export default function SampleProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [projectsContent, setProjectsContent] = useState<PageContent | null>(null);
+  const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    
+    // Fetch dynamic content and projects
+    const fetchContent = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        
+        // Fetch page content and background images
+        const contentResponse = await fetch(`${apiUrl}/api/page-content`)
+        if (contentResponse.ok) {
+          const data: ApiResponse = await contentResponse.json()
+          
+          // Set projects page content
+          if (data.pageContent.projects) {
+            setProjectsContent(data.pageContent.projects)
+          }
+          
+          // Set background image for projects page (use first image if multiple)
+          if (data.backgroundImages.projects && data.backgroundImages.projects.length > 0) {
+            const sortedImages = data.backgroundImages.projects.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+            setBackgroundImage(sortedImages[0])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch page content:', error)
+        // Use fallback content
+        setProjectsContent({
+          description: 'Explore our portfolio of successful coal processing projects delivered across the globe, showcasing our expertise and innovation.',
+          pageName: 'Projects'
+        })
+        setBackgroundImage({
+          id: 'default',
+          url: '/images/project-background.jpg',
+          alt: 'Featured Projects'
+        })
+      }
+    }
+
+    fetchContent()
   }, [])
 
   // Fetch projects from API
@@ -46,6 +103,7 @@ export default function SampleProjectsPage() {
     fetchProjects()
   }, [])
 
+  // Helper function to get image URL
   const getImageUrl = (imagePath: string) => {
     if (imagePath.startsWith('/uploads/')) {
       return `http://localhost:5000${imagePath}`
@@ -107,7 +165,7 @@ export default function SampleProjectsPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/images/project-background.jpg')`,
+            backgroundImage: `url('${backgroundImage ? getImageUrl(backgroundImage.url) : '/images/project-background.jpg'}')`,
             backgroundAttachment: 'fixed',
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
@@ -122,8 +180,7 @@ export default function SampleProjectsPage() {
             Featured <span className="text-orange-500">Projects</span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-            Explore our portfolio of successful coal processing projects delivered across the globe, showcasing our
-            expertise and innovation.
+            {projectsContent?.description || 'Explore our portfolio of successful coal processing projects delivered across the globe, showcasing our expertise and innovation.'}
           </p>
         </div>
       </section>

@@ -1,12 +1,30 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Cog, Settings, CheckCircle, Zap, Handshake, Wrench, Factory } from "lucide-react"
 import { ServiceModal } from "@/components/service-modal"
+
+interface BackgroundImage {
+  id: string;
+  url: string;
+  alt: string;
+  sortOrder?: number;
+}
+
+interface PageContent {
+  description: string;
+  pageName: string;
+}
+
+interface ApiResponse {
+  pageContent: { [key: string]: PageContent };
+  backgroundImages: { [key: string]: BackgroundImage[] };
+}
 
 interface Service {
   icon: React.ComponentType<{ className?: string }>
@@ -22,10 +40,58 @@ interface Service {
 export default function ServicesPage() {
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [servicesContent, setServicesContent] = useState<PageContent | null>(null);
+  const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
+  const router = useRouter()
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    
+    // Fetch dynamic content
+    const fetchContent = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await fetch(`${apiUrl}/api/page-content`)
+        
+        if (response.ok) {
+          const data: ApiResponse = await response.json()
+          
+          // Set services page content
+          if (data.pageContent.services) {
+            setServicesContent(data.pageContent.services)
+          }
+          
+          // Set background image for services page (use first image if multiple)
+          if (data.backgroundImages.services && data.backgroundImages.services.length > 0) {
+            const sortedImages = data.backgroundImages.services.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+            setBackgroundImage(sortedImages[0])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch page content:', error)
+        // Use fallback content
+        setServicesContent({
+          description: 'Comprehensive coal processing solutions tailored to meet your specific operational requirements and goals.',
+          pageName: 'Services'
+        })
+        setBackgroundImage({
+          id: 'default',
+          url: '/images/services-background.JPG',
+          alt: 'Our Services'
+        })
+      }
+    }
+
+    fetchContent()
   }, [])
+
+  // Helper function to get image URL
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`;
+    }
+    return imagePath;
+  };
 
   const services: Service[] = [
     {
@@ -189,6 +255,10 @@ export default function ServicesPage() {
     setSelectedService(null)
   }
 
+  const handleGetQuote = () => {
+    router.push('/contact')
+  }
+
   return (
     <>
       <div className="min-h-screen bg-white">
@@ -200,7 +270,7 @@ export default function ServicesPage() {
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url('/images/services-background.jpg')`,
+              backgroundImage: `url('${backgroundImage ? getImageUrl(backgroundImage.url) : '/images/services-background.JPG'}')`,
               backgroundAttachment: 'fixed',
               backgroundSize: 'cover',
               backgroundPosition: 'center center',
@@ -215,7 +285,7 @@ export default function ServicesPage() {
               Our <span className="text-orange-500">Services</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-              Comprehensive coal processing solutions tailored to meet your specific operational requirements and goals.
+              {servicesContent?.description || 'Comprehensive coal processing solutions tailored to meet your specific operational requirements and goals.'}
             </p>
           </div>
         </section>
@@ -264,15 +334,12 @@ export default function ServicesPage() {
                 operations.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3">
-                  Get Quote
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white px-8 py-3 bg-transparent"
+                <Button 
+                  size="lg" 
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3"
+                  onClick={handleGetQuote}
                 >
-                  Contact Us
+                  Get Quote
                 </Button>
               </div>
             </div>
