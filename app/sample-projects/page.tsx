@@ -29,8 +29,17 @@ interface Project {
   isActive: boolean
 }
 
+interface ProjectStats {
+  _id: string;
+  statKey: string;
+  statLabel: string;
+  statValue: string;
+  sortOrder: number;
+}
+
 export default function SampleProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
+  const [projectStats, setProjectStats] = useState<ProjectStats[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [projectsContent, setProjectsContent] = useState<PageContent | null>(null);
@@ -78,19 +87,39 @@ export default function SampleProjectsPage() {
     fetchContent()
   }, [])
 
-  // Fetch projects from API
+  // Fetch projects and stats from API
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchProjectsAndStats = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         
-        if (!response.ok) {
+        // Fetch projects and stats in parallel
+        const [projectsResponse, statsResponse] = await Promise.all([
+          fetch(`${apiUrl}/api/projects`),
+          fetch(`${apiUrl}/api/projects/stats`)
+        ])
+        
+        if (!projectsResponse.ok) {
           throw new Error('Failed to fetch projects')
         }
         
-        const projectsData = await response.json()
+        const projectsData = await projectsResponse.json()
         setProjects(projectsData)
+        
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json()
+          setProjectStats(statsData)
+        } else {
+          // Use fallback stats if API fails
+          setProjectStats([
+            { _id: '1', statKey: 'projects_completed', statLabel: 'Projects Completed', statValue: '500+', sortOrder: 1 },
+            { _id: '2', statKey: 'countries_served', statLabel: 'Countries Served', statValue: '25', sortOrder: 2 },
+            { _id: '3', statKey: 'tons_processed', statLabel: 'Tons Processed Annually', statValue: '50M+', sortOrder: 3 },
+            { _id: '4', statKey: 'ontime_delivery', statLabel: 'On-Time Delivery', statValue: '99%', sortOrder: 4 }
+          ])
+        }
+        
         setError(null)
       } catch (err) {
         console.error('Error fetching projects:', err)
@@ -100,7 +129,7 @@ export default function SampleProjectsPage() {
       }
     }
 
-    fetchProjects()
+    fetchProjectsAndStats()
   }, [])
 
   // Helper function to get image URL
@@ -196,22 +225,28 @@ export default function SampleProjectsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <Card key={project._id} className="hover:shadow-lg transition-all duration-300 group overflow-hidden">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={getImageUrl(project.image) || "/placeholder.svg"}
-                    alt={project.title}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 text-center">{project.title}</h3>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {projects.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {projects.map((project) => (
+                <Card key={project._id} className="hover:shadow-lg transition-all duration-300 group overflow-hidden">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={getImageUrl(project.image) || "/placeholder.svg"}
+                      alt={project.title}
+                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <CardContent className="p-6">
+                    <h3 className="text-2xl font-bold text-gray-900 text-center">{project.title}</h3>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">No projects available at the moment.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -223,23 +258,13 @@ export default function SampleProjectsPage() {
             <p className="text-xl text-gray-600">Our track record speaks for itself</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-500 mb-2">500+</div>
-              <div className="text-gray-600 font-medium">Projects Completed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-500 mb-2">25</div>
-              <div className="text-gray-600 font-medium">Countries Served</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-500 mb-2">50M+</div>
-              <div className="text-gray-600 font-medium">Tons Processed Annually</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-500 mb-2">99%</div>
-              <div className="text-gray-600 font-medium">On-Time Delivery</div>
-            </div>
+          <div className={`grid gap-8 ${projectStats.length === 4 ? 'grid-cols-2 md:grid-cols-4' : projectStats.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
+            {projectStats.map((stat) => (
+              <div key={stat._id} className="text-center">
+                <div className="text-4xl font-bold text-orange-500 mb-2">{stat.statValue}</div>
+                <div className="text-gray-600 font-medium">{stat.statLabel}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

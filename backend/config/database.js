@@ -10,6 +10,13 @@ const sequelize = new Sequelize(
     port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT, 10) : 3306,
     dialect: 'mysql',
     logging: false,
+    // Add connection pool configuration
+    pool: {
+      max: 10,        // Maximum number of connections
+      min: 0,         // Minimum number of connections
+      acquire: 30000, // Maximum time to get connection (ms)
+      idle: 10000,    // Maximum time connection can be idle (ms)
+    },
     define: {
       timestamps: true
     }

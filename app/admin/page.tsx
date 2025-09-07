@@ -88,6 +88,25 @@ interface ContactContent {
   workingHours: string;
 }
 
+interface ProjectStats {
+  _id: string;
+  statKey: string;
+  statLabel: string;
+  statValue: string;
+  sortOrder: number;
+}
+
+interface GlobalOffice {
+  _id: string;
+  title: string;
+  address: string;
+  phone: string;
+  email: string;
+  workingHours: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
 export default function AdminPage() {
   // Auth states
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -100,6 +119,12 @@ export default function AdminPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [pageContent, setPageContent] = useState<PageContent>({});
   const [backgroundImages, setBackgroundImages] = useState<BackgroundImages>({});
+  const [projectStats, setProjectStats] = useState<ProjectStats[]>([]);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [globalOffices, setGlobalOffices] = useState<GlobalOffice[]>([]);
+  const [officesLoading, setOfficesLoading] = useState(false);
+  const [editingOffice, setEditingOffice] = useState<GlobalOffice | null>(null);
+  const [isOfficeDialogOpen, setIsOfficeDialogOpen] = useState(false);
   
   const [contactContent, setContactContent] = useState<ContactContent>({
     address: '123 Business St, City, State 12345',
@@ -248,6 +273,54 @@ export default function AdminPage() {
     }
   };
 
+  const fetchProjectStats = async () => {
+    setStatsLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/projects/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const statsData = await response.json();
+        setProjectStats(statsData);
+      }
+    } catch (err) {
+      console.error('Error fetching project stats:', err);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const fetchGlobalOffices = async () => {
+    setOfficesLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/offices`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const officesData = await response.json();
+        setGlobalOffices(officesData);
+      }
+    } catch (err) {
+      console.error('Error fetching global offices:', err);
+    } finally {
+      setOfficesLoading(false);
+    }
+  };
+
   // Save functions
   const savePageDescription = async (pageKey: string) => {
     setSaveLoading(true);
@@ -376,6 +449,233 @@ export default function AdminPage() {
     } catch (err) {
       console.error('Error saving project:', err);
       alert('Failed to save project');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const saveProjectStats = async (statId: string, statLabel: string, statValue: string) => {
+    setSaveLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/projects/stats/${statId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ statLabel, statValue }),
+      });
+
+      if (response.ok) {
+        const updatedStat = await response.json();
+        setProjectStats(prev => prev.map(stat => stat._id === updatedStat._id ? updatedStat : stat));
+        alert('Project statistic updated successfully!');
+      } else {
+        alert('Failed to update project statistic');
+      }
+    } catch (err) {
+      console.error('Error updating project stat:', err);
+      alert('Failed to update project statistic');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const createProject = async () => {
+    setSaveLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    if (!editingProject?.title) {
+      alert('Project title is required');
+      setSaveLoading(false);
+      return;
+    }
+
+    if (!projectSelectedFile) {
+      alert('Project image is required');
+      setSaveLoading(false);
+      return;
+    }
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const formData = new FormData();
+      formData.append('title', editingProject.title);
+      formData.append('image', projectSelectedFile);
+
+      const response = await fetch(`${apiUrl}/api/projects`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const newProject = await response.json();
+        setProjects(prev => [newProject, ...prev]);
+        setIsProjectDialogOpen(false);
+        setEditingProject(null);
+        setProjectSelectedFile(null);
+        setProjectImagePreview(null);
+        alert('Project created successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || 'Failed to create project');
+      }
+    } catch (err) {
+      console.error('Error creating project:', err);
+      alert('Failed to create project');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const deleteProject = async (projectId: string) => {
+    if (!confirm('Are you sure you want to delete this project?')) return;
+
+    setSaveLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/projects/${projectId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setProjects(prev => prev.filter(project => project._id !== projectId));
+        alert('Project deleted successfully!');
+      } else {
+        alert('Failed to delete project');
+      }
+    } catch (err) {
+      console.error('Error deleting project:', err);
+      alert('Failed to delete project');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const saveGlobalOffice = async (office: GlobalOffice) => {
+    setSaveLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/offices/${office._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: office.title,
+          address: office.address,
+          phone: office.phone,
+          email: office.email,
+          workingHours: office.workingHours
+        }),
+      });
+
+      if (response.ok) {
+        const updatedOffice = await response.json();
+        setGlobalOffices(prev => prev.map(o => o._id === updatedOffice._id ? updatedOffice : o));
+        setIsOfficeDialogOpen(false);
+        setEditingOffice(null);
+        alert('Office updated successfully!');
+      } else {
+        alert('Failed to update office');
+      }
+    } catch (err) {
+      console.error('Error updating office:', err);
+      alert('Failed to update office');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const createGlobalOffice = async () => {
+    setSaveLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    if (!editingOffice?.title || !editingOffice?.address || !editingOffice?.phone || !editingOffice?.email || !editingOffice?.workingHours) {
+      alert('All fields are required');
+      setSaveLoading(false);
+      return;
+    }
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/offices`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: editingOffice.title,
+          address: editingOffice.address,
+          phone: editingOffice.phone,
+          email: editingOffice.email,
+          workingHours: editingOffice.workingHours
+        }),
+      });
+
+      if (response.ok) {
+        const newOffice = await response.json();
+        setGlobalOffices(prev => [...prev, newOffice]);
+        setIsOfficeDialogOpen(false);
+        setEditingOffice(null);
+        alert('Office created successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || 'Failed to create office');
+      }
+    } catch (err) {
+      console.error('Error creating office:', err);
+      alert('Failed to create office');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const deleteGlobalOffice = async (officeId: string) => {
+    if (!confirm('Are you sure you want to delete this office?')) return;
+
+    setSaveLoading(true);
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/offices/${officeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setGlobalOffices(prev => prev.filter(office => office._id !== officeId));
+        alert('Office deleted successfully!');
+      } else {
+        alert('Failed to delete office');
+      }
+    } catch (err) {
+      console.error('Error deleting office:', err);
+      alert('Failed to delete office');
     } finally {
       setSaveLoading(false);
     }
@@ -696,6 +996,8 @@ export default function AdminPage() {
       fetchPageContent();
       fetchNews();
       fetchProjects();
+      fetchProjectStats();
+      fetchGlobalOffices(); // Add this line
     }
   }, [user]);
 
@@ -1050,10 +1352,24 @@ export default function AdminPage() {
                   <div className="mt-8 pt-8 border-t">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-semibold">Current Projects</h3>
-                      <Button onClick={fetchProjects} disabled={projectsLoading} variant="outline" size="sm">
-                        <RefreshCw className={`h-4 w-4 ${projectsLoading ? 'animate-spin' : ''}`} />
-                        Refresh
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => {
+                            setEditingProject({ _id: '', title: '', image: '', isActive: true });
+                            setIsProjectDialogOpen(true);
+                          }} 
+                          variant="default" 
+                          size="sm"
+                          className="gap-2"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add Project
+                        </Button>
+                        <Button onClick={fetchProjects} disabled={projectsLoading} variant="outline" size="sm">
+                          <RefreshCw className={`h-4 w-4 ${projectsLoading ? 'animate-spin' : ''}`} />
+                          Refresh
+                        </Button>
+                      </div>
                     </div>
                     
                     {projectsLoading ? (
@@ -1075,18 +1391,93 @@ export default function AdminPage() {
                               <h4 className="font-medium text-slate-900 mb-3">
                                 {project.title}
                               </h4>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setEditingProject({ ...project });
-                                  setIsProjectDialogOpen(true);
-                                }}
-                                className="gap-1"
-                              >
-                                <Edit className="h-3 w-3" />
-                                Edit
-                              </Button>
+                              <div className="flex gap-2 justify-center">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingProject({ ...project });
+                                    setIsProjectDialogOpen(true);
+                                  }}
+                                  className="gap-1"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => deleteProject(project._id)}
+                                  className="gap-1"
+                                  disabled={saveLoading}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Project Statistics Management */}
+                  <div className="mt-8 pt-8 border-t">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Project Statistics</h3>
+                      <Button onClick={fetchProjectStats} disabled={statsLoading} variant="outline" size="sm">
+                        <RefreshCw className={`h-4 w-4 ${statsLoading ? 'animate-spin' : ''}`} />
+                        Refresh
+                      </Button>
+                    </div>
+                    
+                    {statsLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <RefreshCw className="h-8 w-8 animate-spin text-slate-400" />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {projectStats.map((stat) => (
+                          <div key={stat._id} className="border rounded-lg p-4 bg-slate-50">
+                            <div className="space-y-3">
+                              <div>
+                                <Label htmlFor={`statLabel-${stat._id}`}>Label</Label>
+                                <Input
+                                  id={`statLabel-${stat._id}`}
+                                  value={stat.statLabel}
+                                  onChange={(e) => {
+                                    setProjectStats(prev => prev.map(s => 
+                                      s._id === stat._id ? { ...s, statLabel: e.target.value } : s
+                                    ));
+                                  }}
+                                  placeholder="Enter statistic label"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`statValue-${stat._id}`}>Value</Label>
+                                <Input
+                                  id={`statValue-${stat._id}`}
+                                  value={stat.statValue}
+                                  onChange={(e) => {
+                                    setProjectStats(prev => prev.map(s => 
+                                      s._id === stat._id ? { ...s, statValue: e.target.value } : s
+                                    ));
+                                  }}
+                                  placeholder="Enter statistic value"
+                                />
+                              </div>
+                              <div className="flex justify-end pt-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => saveProjectStats(stat._id, stat.statLabel, stat.statValue)}
+                                  disabled={saveLoading}
+                                  className="gap-1"
+                                >
+                                  {saveLoading ? <RefreshCw className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                                  Save
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -1138,57 +1529,82 @@ export default function AdminPage() {
                     </>
                   )}
 
+                  {/* Global Offices Management */}
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="address">Address</Label>
-                        <Textarea
-                          id="address"
-                          value={contactContent.address}
-                          onChange={(e) => setContactContent(prev => ({ ...prev, address: e.target.value }))}
-                          placeholder="Enter company address"
-                          rows={3}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="workingHours">Working Hours</Label>
-                        <Textarea
-                          id="workingHours"
-                          value={contactContent.workingHours}
-                          onChange={(e) => setContactContent(prev => ({ ...prev, workingHours: e.target.value }))}
-                          placeholder="Enter working hours"
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-                      <div>
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          value={contactContent.phone}
-                          onChange={(e) => setContactContent(prev => ({ ...prev, phone: e.target.value }))}
-                          placeholder="Enter phone number"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input
-                          id="email"
-                          value={contactContent.email}
-                          onChange={(e) => setContactContent(prev => ({ ...prev, email: e.target.value }))}
-                          placeholder="Enter email address"
-                        />
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Global Offices</h3>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => {
+                            setEditingOffice({ 
+                              _id: '', 
+                              title: '', 
+                              address: '', 
+                              phone: '', 
+                              email: '', 
+                              workingHours: '', 
+                              isActive: true, 
+                              sortOrder: 0 
+                            });
+                            setIsOfficeDialogOpen(true);
+                          }} 
+                          variant="default" 
+                          size="sm"
+                          className="gap-2"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add Office
+                        </Button>
+                        <Button onClick={fetchGlobalOffices} disabled={officesLoading} variant="outline" size="sm">
+                          <RefreshCw className={`h-4 w-4 ${officesLoading ? 'animate-spin' : ''}`} />
+                          Refresh
+                        </Button>
                       </div>
                     </div>
                     
-                    <div className="flex justify-end pt-4">
-                      <Button onClick={saveContactInfo} disabled={saveLoading}>
-                        {saveLoading ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                        Save Contact Info
-                      </Button>
-                    </div>
+                    {officesLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <RefreshCw className="h-8 w-8 animate-spin text-slate-400" />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {globalOffices.map((office) => (
+                          <div key={office._id} className="border rounded-lg p-4 bg-slate-50">
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-slate-900">{office.title}</h4>
+                              <p className="text-sm text-slate-600 whitespace-pre-line">{office.address}</p>
+                              <p className="text-sm text-slate-600">📞 {office.phone}</p>
+                              <p className="text-sm text-slate-600">✉️ {office.email}</p>
+                              <p className="text-sm text-slate-600">🕒 {office.workingHours}</p>
+                              <div className="flex gap-2 justify-end pt-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingOffice({ ...office });
+                                    setIsOfficeDialogOpen(true);
+                                  }}
+                                  className="gap-1"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => deleteGlobalOffice(office._id)}
+                                  className="gap-1"
+                                  disabled={saveLoading}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -1315,42 +1731,31 @@ export default function AdminPage() {
 
       {/* Edit Project Dialog */}
       <Dialog open={isProjectDialogOpen} onOpenChange={setIsProjectDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Project</DialogTitle>
+            <DialogTitle>
+              {editingProject?._id ? 'Edit Project' : 'Create New Project'}
+            </DialogTitle>
             <DialogDescription>
-              Update the project title and image. Only these fields can be modified.
+              {editingProject?._id ? 'Update project information and image' : 'Add a new project to your portfolio'}
             </DialogDescription>
           </DialogHeader>
+          
           {editingProject && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <Label htmlFor="project-title">Project Title</Label>
+                <Label htmlFor="projectTitle">Project Title</Label>
                 <Input
-                  id="project-title"
+                  id="projectTitle"
                   value={editingProject.title}
-                  onChange={(e) => setEditingProject(prev => prev ? { ...prev, title: e.target.value } : null)}
+                  onChange={(e) => setEditingProject({...editingProject, title: e.target.value})}
                   placeholder="Enter project title"
                 />
               </div>
 
               <div>
-                <Label htmlFor="project-image">Project Image</Label>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      type="button" 
-                      onClick={() => projectFileInputRef.current?.click()}
-                      variant="outline"
-                      className="gap-2"
-                    >
-                      <Upload className="h-4 w-4" />
-                      Choose New Image
-                    </Button>
-                    <span className="text-sm text-slate-500">
-                      {projectSelectedFile ? projectSelectedFile.name : 'or keep current image'}
-                    </span>
-                  </div>
+                <Label htmlFor="projectImage">Project Image</Label>
+                <div className="mt-2">
                   <input
                     ref={projectFileInputRef}
                     type="file"
@@ -1358,43 +1763,142 @@ export default function AdminPage() {
                     onChange={handleProjectFileChange}
                     className="hidden"
                   />
-                  <div className="border rounded-lg p-3 bg-slate-50">
-                    <div className="flex items-center gap-2 mb-2">
-                      <ImageIcon className="h-4 w-4" />
-                      <span className="text-sm font-medium">Preview</span>
-                    </div>
-                    <img 
-                      src={projectImagePreview || getImageUrl(editingProject.image)} 
-                      alt="Preview"
-                      className="w-full h-48 object-cover rounded"
-                    />
-                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => projectFileInputRef.current?.click()}
+                    className="w-full h-32 border-dashed"
+                  >
+                    {projectImagePreview ? (
+                      <img src={projectImagePreview} alt="Preview" className="h-full w-auto object-contain" />
+                    ) : editingProject.image ? (
+                      <img src={getImageUrl(editingProject.image)} alt="Current" className="h-full w-auto object-contain" />
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <Upload className="h-8 w-8 mb-2" />
+                        <span>Click to upload image</span>
+                      </div>
+                    )}
+                  </Button>
                 </div>
               </div>
-              
-              <div className="flex justify-end gap-3">
-                <Button
-                  variant="outline"
+
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  variant="outline" 
                   onClick={() => {
                     setIsProjectDialogOpen(false);
+                    setEditingProject(null);
                     setProjectSelectedFile(null);
                     setProjectImagePreview(null);
                   }}
-                  disabled={saveLoading}
                 >
-                  <X className="h-4 w-4 mr-1" />
                   Cancel
                 </Button>
-                <Button
-                  onClick={() => editingProject && saveProject(editingProject)}
+                <Button 
+                  onClick={editingProject._id ? () => saveProject(editingProject) : createProject}
                   disabled={saveLoading}
                 >
                   {saveLoading ? (
-                    <RefreshCw className="h-4 w-4 mr-1 animate-spin" /> 
+                    <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
                   ) : (
                     <Save className="h-4 w-4 mr-1" />
                   )}
-                  Save Changes
+                  {editingProject._id ? 'Update Project' : 'Create Project'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Global Office Dialog */}
+      <Dialog open={isOfficeDialogOpen} onOpenChange={setIsOfficeDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingOffice?._id ? 'Edit Office' : 'Create New Office'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingOffice?._id ? 'Update office information' : 'Add a new global office location'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingOffice && (
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="officeTitle">Office Title</Label>
+                <Input
+                  id="officeTitle"
+                  value={editingOffice.title}
+                  onChange={(e) => setEditingOffice({...editingOffice, title: e.target.value})}
+                  placeholder="e.g., Headquarters - USA"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="officeAddress">Address</Label>
+                <Textarea
+                  id="officeAddress"
+                  value={editingOffice.address}
+                  onChange={(e) => setEditingOffice({...editingOffice, address: e.target.value})}
+                  placeholder="Enter full address (use line breaks for formatting)"
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="officePhone">Phone Number</Label>
+                  <Input
+                    id="officePhone"
+                    value={editingOffice.phone}
+                    onChange={(e) => setEditingOffice({...editingOffice, phone: e.target.value})}
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="officeEmail">Email Address</Label>
+                  <Input
+                    id="officeEmail"
+                    type="email"
+                    value={editingOffice.email}
+                    onChange={(e) => setEditingOffice({...editingOffice, email: e.target.value})}
+                    placeholder="office@company.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="officeWorkingHours">Working Hours</Label>
+                <Input
+                  id="officeWorkingHours"
+                  value={editingOffice.workingHours}
+                  onChange={(e) => setEditingOffice({...editingOffice, workingHours: e.target.value})}
+                  placeholder="Mon-Fri: 9:00 AM - 5:00 PM EST"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsOfficeDialogOpen(false);
+                    setEditingOffice(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={editingOffice._id ? () => saveGlobalOffice(editingOffice) : createGlobalOffice}
+                  disabled={saveLoading}
+                >
+                  {saveLoading ? (
+                    <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-1" />
+                  )}
+                  {editingOffice._id ? 'Update Office' : 'Create Office'}
                 </Button>
               </div>
             </div>

@@ -27,6 +27,17 @@ interface ApiResponse {
   backgroundImages: { [key: string]: BackgroundImage[] };
 }
 
+interface GlobalOffice {
+  _id: string;
+  title: string;
+  address: string;
+  phone: string;
+  email: string;
+  workingHours: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
 interface FormData {
   firstName: string;
   lastName: string;
@@ -46,6 +57,7 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactContent, setContactContent] = useState<PageContent | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
+  const [globalOffices, setGlobalOffices] = useState<GlobalOffice[]>([]);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -60,14 +72,15 @@ export default function ContactPage() {
   useEffect(() => {
     window.scrollTo(0, 0)
     
-    // Fetch dynamic content
+    // Fetch dynamic content and global offices
     const fetchContent = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-        const response = await fetch(`${apiUrl}/api/page-content`)
         
-        if (response.ok) {
-          const data: ApiResponse = await response.json()
+        // Fetch page content and background images
+        const contentResponse = await fetch(`${apiUrl}/api/page-content`)
+        if (contentResponse.ok) {
+          const data: ApiResponse = await contentResponse.json()
           
           // Set contact page content
           if (data.pageContent.contact) {
@@ -79,6 +92,13 @@ export default function ContactPage() {
             const sortedImages = data.backgroundImages.contact.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
             setBackgroundImage(sortedImages[0])
           }
+        }
+
+        // Fetch global offices
+        const officesResponse = await fetch(`${apiUrl}/api/offices`)
+        if (officesResponse.ok) {
+          const officesData = await officesResponse.json()
+          setGlobalOffices(officesData)
         }
       } catch (error) {
         console.error('Failed to fetch page content:', error)
@@ -92,6 +112,19 @@ export default function ContactPage() {
           url: '/images/contact-background.JPG',
           alt: 'Contact Us'
         })
+        // Use fallback offices
+        setGlobalOffices([
+          {
+            _id: '1',
+            title: "Headquarters - USA",
+            address: "238 Markell Drive\nBluefield, WV 24701, USA",
+            phone: "+1 (304) 327-8161",
+            email: "info@daniels-wv.com",
+            workingHours: "Mon-Fri: 8:00 AM - 6:00 PM EST",
+            isActive: true,
+            sortOrder: 1
+          }
+        ])
       }
     }
 
@@ -204,29 +237,8 @@ export default function ContactPage() {
     }
   };
 
-  const offices = [
-    {
-      title: "Headquarters - USA",
-      address: "1234 Industrial Blvd, Coal Valley, WV 25301",
-      phone: "+1 (555) 123-4567",
-      email: "info@danielscompany.com",
-      hours: "Mon-Fri: 8:00 AM - 6:00 PM EST",
-    },
-    {
-      title: "Australia Office",
-      address: "456 Mining Street, Brisbane, QLD 4000",
-      phone: "+61 7 3000 1234",
-      email: "australia@danielscompany.com",
-      hours: "Mon-Fri: 9:00 AM - 5:00 PM AEST",
-    },
-    {
-      title: "South Africa Office",
-      address: "789 Industrial Park, Johannesburg, 2000",
-      phone: "+27 11 123 4567",
-      email: "southafrica@danielscompany.com",
-      hours: "Mon-Fri: 8:00 AM - 5:00 PM SAST",
-    },
-  ]
+  // Get the primary office (first office) for the main contact section
+  const primaryOffice = globalOffices[0];
 
   return (
     <div className="min-h-screen bg-white">
@@ -391,38 +403,39 @@ export default function ContactPage() {
             {/* Contact Information */}
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Get in Touch</h2>
-              <div className="space-y-6 mb-8">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="h-6 w-6 text-orange-500" />
+              {primaryOffice && (
+                <div className="space-y-6 mb-8">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Phone className="h-6 w-6 text-orange-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">Phone</h3>
+                      <p className="text-gray-600">{primaryOffice.phone}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Phone</h3>
-                    <p className="text-gray-600">+1 (304) 327-8161</p>
-                  </div>
-                </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Mail className="h-6 w-6 text-orange-500" />
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Mail className="h-6 w-6 text-orange-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">Email</h3>
+                      <p className="text-gray-600">{primaryOffice.email}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Email</h3>
-                    <p className="text-gray-600">info@daniels-wv.com</p>
-                  </div>
-                </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin className="h-6 w-6 text-orange-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Address</h3>
-                    <p className="text-gray-600">238 Markell Drive</p>
-                    <p className="text-gray-600">Bluefield, WV 24701, USA</p>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <MapPin className="h-6 w-6 text-orange-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">Address</h3>
+                      <div className="text-gray-600 whitespace-pre-line">{primaryOffice.address}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Quick Stats */}
               <Card className="bg-gray-50">
@@ -457,43 +470,49 @@ export default function ContactPage() {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Global Offices</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Global Offices & Representatives</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              With offices around the world, we're always close to our clients and ready to provide local support.
+              With offices and representatives around the world, we're always close to our clients and ready to provide local support.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {offices.map((office, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">{office.title}</h3>
+          {globalOffices.length > 0 ? (
+            <div className={`grid gap-8 ${globalOffices.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : globalOffices.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+              {globalOffices.map((office) => (
+                <Card key={office._id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">{office.title}</h3>
 
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <MapPin className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">{office.address}</span>
-                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3">
+                        <MapPin className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-600 text-sm whitespace-pre-line">{office.address}</span>
+                      </div>
 
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">{office.phone}</span>
-                    </div>
+                      <div className="flex items-center space-x-3">
+                        <Phone className="h-5 w-5 text-orange-500 flex-shrink-0" />
+                        <span className="text-gray-600 text-sm">{office.phone}</span>
+                      </div>
 
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">{office.email}</span>
-                    </div>
+                      <div className="flex items-center space-x-3">
+                        <Mail className="h-5 w-5 text-orange-500 flex-shrink-0" />
+                        <span className="text-gray-600 text-sm">{office.email}</span>
+                      </div>
 
-                    <div className="flex items-center space-x-3">
-                      <Clock className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">{office.hours}</span>
+                      <div className="flex items-center space-x-3">
+                        <Clock className="h-5 w-5 text-orange-500 flex-shrink-0" />
+                        <span className="text-gray-600 text-sm">{office.workingHours}</span>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">No office information available at the moment.</p>
+            </div>
+          )}
         </div>
       </section>
 

@@ -27,12 +27,14 @@ export function HeroSection() {
 
   // Fetch dynamic content and background images
   useEffect(() => {
+    let isMounted = true; // Add cleanup flag
+
     const fetchContent = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         const response = await fetch(`${apiUrl}/api/page-content`)
         
-        if (response.ok) {
+        if (response.ok && isMounted) { // Check if component is still mounted
           const data: ApiResponse = await response.json()
           
           // Set home page content
@@ -42,7 +44,6 @@ export function HeroSection() {
           
           // Set background images for home page
           if (data.backgroundImages.home && data.backgroundImages.home.length > 0) {
-            // Sort images by sortOrder if available
             const sortedImages = data.backgroundImages.home.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
             setBackgroundImages(sortedImages)
           } else {
@@ -67,23 +68,29 @@ export function HeroSection() {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch page content:', error)
-        // Use fallback content and images
-        setHomeContent({
-          description: 'Advanced coal processing technology and expertise delivering efficient, sustainable solutions for the energy industry.',
-          pageName: 'Home'
-        })
-        setBackgroundImages([
-          {
-            id: 'default-1',
-            url: '/images/coal-mining-background.JPG',
-            alt: 'Coal Mining Operations'
-          }
-        ])
+        if (isMounted) {
+          console.error('Failed to fetch page content:', error)
+          // Use fallback content and images
+          setHomeContent({
+            description: 'Advanced coal processing technology and expertise delivering efficient, sustainable solutions for the energy industry.',
+            pageName: 'Home'
+          })
+          setBackgroundImages([
+            {
+              id: 'default-1',
+              url: '/images/coal-mining-background.JPG',
+              alt: 'Coal Mining Operations'
+            }
+          ])
+        }
       }
     }
 
     fetchContent()
+
+    return () => {
+      isMounted = false; // Cleanup flag
+    }
   }, [])
 
   // Helper function to get image URL
